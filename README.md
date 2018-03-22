@@ -5,7 +5,6 @@ SETUP WINDOWS 10
 
 **Instalar requisitos Python3.6 e Git client**
 Fazer download  e instalar ultima versao 3.6+ (Adicionar python ao PATH) de https://www.python.org/downloads/windows/
-
 Fazer Download e instalar o GIT client de https://git-scm.com/download/win
 
 **Configurar ambiente de desenvolvimento** 
