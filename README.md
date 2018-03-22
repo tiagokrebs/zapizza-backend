@@ -10,6 +10,7 @@ Fazer download  e instalar ultima versao 3.6+ (Adicionar python ao PATH) de http
 Fazer Download e instalar o GIT client de https://git-scm.com/download/win
 
 **Configurar ambiente de desenvolvimento** 
+
 Abrir PowerShell Windows. O PowerShell se assemelha ao linux porque integra comandos bash (cd, ls, rm, ...)
 
 **Testar versão Python instalada**
@@ -30,6 +31,7 @@ cd Mocca
 ```
 
 **Clona repositório no BitBucket**
+
 git clone https://bitbucket.org/zamopiccazzateam/zapizza-2.0
 
 **Atualiza pip (opcional)**
@@ -41,6 +43,7 @@ python -m venv env36
 ```
 
 **Ativa ambiente virtual **
+
 Esse passo deve ser feito sempre antes de qualquer alteração/execução do projeto
 ```bash
 .\env36\Scripts\activate.bat
