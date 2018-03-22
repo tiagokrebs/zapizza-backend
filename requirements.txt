@@ -24,7 +24,6 @@ translationstring==1.3
 venusian==1.1.0
 waitress==1.1.0
 WebOb==1.8.0rc1
-zapizza==0.0.0
 zope.deprecation==4.3.0
 zope.interface==4.4.3
 zope.sqlalchemy==1.0
