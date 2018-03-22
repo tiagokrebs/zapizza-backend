@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %} - MySite</title>
+    <link rel="stylesheet"
+          href="//oss.maxcdn.com/bootstrap/3.3.4/css/bootstrap.css">
+    <link rel="stylesheet"
+          href="{{ request.static_url('zapizza.site:static/zapizza.css') }}">
+    <link rel="shortcut icon"
+          href="{{ request.static_url('zapizza.site:static/pyramid-16x16.png') }}">
+</head>
+<body>
+
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand"
+               href="{{ request.route_url('home') }}">MySite</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li>
+                <a href="{{ request.route_url('todos_list') }}">
+                    ToDos
+                </a>
+            </li>
+            <li>
+                <a href="{{ request.route_url('users_list') }}">
+                    Users
+                </a>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          {% if view.current_user %}
+              <li>
+                  <a href="{{ request.route_url('users_view',
+                  username=view.current_user.username) }}">
+                    {{ view.current_user.first_name }}
+                    {{ view.current_user.last_name }}
+                  </a></li>
+              <li>
+                  <a href="{{ request.route_url('logout') }}">Logout</a>
+              </li>
+          {% else %}
+              <li>
+                  <a href="{{ request.route_url('login') }}">Login</a>
+              </li>
+          {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<div id="content" class="container">
+
+  {% if view.messages %}
+    {% for message in view.messages %}
+        <div class="alert alert-info">
+          {{ message }}
+        </div>
+    {% endfor %}
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<script src="//oss.maxcdn.com/jquery/2.1.3/jquery.js"></script>
+</body>
+</html>

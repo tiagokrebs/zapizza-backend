@@ -1,0 +1,9 @@
+{% extends "base.jinja2" %}
+{% block title %}Not Found {% endblock %}
+{% block content %}
+
+    <h1>Missing Page</h1>
+    <p>The page at <em>{{ request.url }}</em> could not
+        be found.</p>
+
+{% endblock %}
