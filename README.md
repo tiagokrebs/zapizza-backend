@@ -35,7 +35,7 @@ cd Mocca
 git clone https://bitbucket.org/zamopiccazzateam/zapizza-2.0
 
 **Atualiza pip (opcional)**
-`python -m pip install --upgrade p`
+`python -m pip install --upgrade pip`
 
 **Criar ambiente virtual Pyhton**
 ```bash
@@ -52,7 +52,6 @@ Esse passo deve ser feito sempre antes de qualquer alteração/execução do pro
 **Instala dependecias do projeto**
 ```bash
 cd zapizza-2.0
-python -m pip install --upgrade pip
 pip install -e . -r requirements.txt
 ```
 
