@@ -10,6 +10,7 @@ from pyramid.paster import get_appsettings, setup_logging
 from ..todos.models import ToDo, sample_todos
 from ..users.models import User, sample_users
 from ..pizzas.models import Borda, sample_bordas
+from ..pizzas.models import Bebida, sample_bebidas
 
 
 def usage(argv):
@@ -57,4 +58,10 @@ def main(argv=sys.argv):
         for borda in sample_bordas:
             b = Borda(nome_borda=borda['nome_borda'],
                       valor_borda=borda['valor_borda'])
+            Session.add(b)
+
+        # Now add bebidas
+        for bebida in sample_bebidas:
+            b = Bebida(nome_bebida=bebida['nome_bebida'],
+                      valor_bebida=bebida['valor_bebida'])
             Session.add(b)
