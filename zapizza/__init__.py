@@ -44,6 +44,18 @@ def main(global_config, **settings):
     config.add_route('users_delete', '/users/{username}/delete',
                      factory='.users.models.user_factory')
 
+    # Borda routes with route factory
+    config.add_route('bordas_list', '/users',
+                     factory='.pizzas.models.borda_factory')
+    config.add_route('bordas_add', '/users/add',
+                     factory='.pizzas.models.borda_factory')
+    config.add_route('bordas_view', '/borda/{id}',
+                     factory='.pizzas.models.borda_factory')
+    config.add_route('bordas_edit', '/borda/{id}/edit',
+                     factory='.pizzas.models.borda_factory')
+    config.add_route('bordas_delete', '/borda/{id}/delete',
+                     factory='.pizzas.models.borda_factory')
+
     session_secret = settings['session.secret']
     session_factory = SignedCookieSessionFactory(session_secret)
     config.set_session_factory(session_factory)
