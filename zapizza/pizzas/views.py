@@ -86,3 +86,11 @@ class BordaViews:
         url = self.request.route_url('bodas_view',
                                      id=self.context.id)
         return HTTPFound(url)
+
+    @view_config(route_name='bordas_delete')
+    def delete(self):
+        msg = 'Deleted: %s' % self.context.nome_borda
+        self.request.session.flash('Deleted: %s' % self.context.nome_borda)
+        Session.delete(self.context)
+        url = self.request.route_url('bordas_list', _query=dict(msg=msg))
+        return HTTPFound(url)

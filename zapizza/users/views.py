@@ -30,17 +30,17 @@ class UserViews:
         self.current_user = User.by_username(request.authenticated_userid)
 
     @view_config(route_name='users_list',
-                 renderer='templates/bordas/list.jinja2'
+                 renderer='templates/list.jinja2'
                  )
     def list(self):
         return dict(users=User.list())
 
-    @view_config(route_name='users_add', renderer='templates/bordas/add.jinja2')
+    @view_config(route_name='users_add', renderer='templates/add.jinja2')
     def add(self):
         return dict(add_form=self.form.render())
 
     @view_config(route_name='users_add',
-                 renderer='templates/bordas/add.jinja2',
+                 renderer='templates/add.jinja2',
                  request_method='POST')
     def add_handler(self):
         controls = self.request.POST.items()
@@ -66,12 +66,12 @@ class UserViews:
     
     @view_config(route_name='users_view',
                  permission='view',
-                 renderer='templates/bordas/view.jinja2')
+                 renderer='templates/view.jinja2')
     def view(self):
         return dict()
 
     @view_config(route_name='users_edit',
-                 renderer='templates/bordas/edit.jinja2')
+                 renderer='templates/edit.jinja2')
     def edit(self):
         edit_form = self.form.render(dict(
             username=self.context.username,
@@ -82,7 +82,7 @@ class UserViews:
         return dict(edit_form=edit_form)
 
     @view_config(route_name='users_edit',
-                 renderer='templates/bordas/edit.jinja2',
+                 renderer='templates/edit.jinja2',
                  request_method='POST')
     def edit_handler(self):
         controls = self.request.POST.items()
