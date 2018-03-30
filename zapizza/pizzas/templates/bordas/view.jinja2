@@ -1,0 +1,32 @@
+{% extends "zapizza:site/templates/base.jinja2" %}
+{% block title %}{{ context.title }}{% endblock %}
+{% block content %}
+    <h1>{{ context.title }}</h1>
+    <ul>
+        <li>
+            <strong>id</strong>: {{ context.id }}
+        </li>
+        <li>
+            <strong>username</strong>: {{ context.username }}
+        </li>
+        <li>
+            <strong>first_name</strong>: {{ context.first_name }}
+        </li>
+        <li>
+            <strong>last_name</strong>: {{ context.last_name }}
+        </li>
+        <li>
+            <strong>groups</strong>: {{ context.groups }}
+        </li>
+    </ul>
+
+    <h2>ToDos</h2>
+    <ul>
+      {% for todo in context.todos %}
+          <li>
+            <a href="{{ request.route_url('todos_view', id=todo.id)
+                }}">{{ todo.title }}</a>
+          </li>
+      {% endfor %}
+    </ul>
+{% endblock %}

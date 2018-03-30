@@ -1,0 +1,9 @@
+{% extends "zapizza:site/templates/base.jinja2" %}
+{% block title %}User Edit {% endblock %}
+{% block content %}
+
+    <h1>User - Edit <em>{{ context.id }}</em></h1>
+
+    <div class="col-md-6">{{ edit_form | safe }}</div>
+
+{% endblock %}
