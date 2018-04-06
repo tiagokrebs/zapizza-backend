@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}{% endblock %} - MySite</title>
+    <title>{% block title %}{% endblock %} - Zapizza</title>
     <link rel="stylesheet"
           href="//oss.maxcdn.com/bootstrap/3.3.4/css/bootstrap.css">
     <link rel="stylesheet"
@@ -17,20 +17,8 @@
     <div class="container-fluid">
         <div class="navbar-header">
             <a class="navbar-brand"
-               href="{{ request.route_url('home') }}">MySite</a>
+               href="{{ request.route_url('home') }}">Zapizza</a>
         </div>
-        <ul class="nav navbar-nav">
-            <li>
-                <a href="{{ request.route_url('todos_list') }}">
-                    ToDos
-                </a>
-            </li>
-            <li>
-                <a href="{{ request.route_url('users_list') }}">
-                    Users
-                </a>
-            </li>
-        </ul>
         <ul class="nav navbar-nav navbar-right">
           {% if view.current_user %}
               <li>
