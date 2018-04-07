@@ -14,7 +14,30 @@
             <div class="form-group">
                 <label for="email">Email</label>
                 <input class="form-control" name="email"
-                       id="email" value="{{ email }}">
+                       id="email" type="email"
+                       value="{{ email }}">
+            </div>
+            <div class="form-group">
+                <label for="nome">Nome</label>
+                <input class="form-control" name="nome"
+                       id="nome" value="{{ nome }}">
+            </div>
+            <div class="form-group">
+                <label for="sobrenome">Sobrenome</label>
+                <input class="form-control" name="sobrenome"
+                       id="sobrenome" value="{{ sobrenome }}">
+            </div>
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <input class="form-control" name="senha"
+                       id="senha" type="password"
+                       value="{{ senha }}">
+            </div>
+            <div class="form-group">
+                <label for="confsenha">Confirme a Senha</label>
+                <input class="form-control" name="confsenha"
+                       id="confsenha" type="password"
+                       value="{{ confsenha }}">
             </div>
             <button type="submit" class="btn btn-default">Registrar</button>
         </form>

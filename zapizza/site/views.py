@@ -23,12 +23,12 @@ class SiteViews:
 
     @view_config(route_name='home', renderer='templates/home.jinja2',
                  request_method='POST')
-    def register_handler(self):
+    def home_register_handler(self):
         request = self.request
         email = request.params['email']
         if email:
             headers = remember(request, email)
-            return HTTPFound(location=request.route_url('home'),
+            return HTTPFound(location=request.route_url('register'),
                              headers=headers)
 
         return dict(
@@ -71,3 +71,22 @@ class SiteViews:
         headers = forget(self.request)
         url = self.request.route_url('home')
         return HTTPFound(location=url, headers=headers)
+
+    @view_config(route_name='register', renderer='templates/register.jinja2')
+    def register(self):
+        return dict()
+
+    @view_config(route_name='register', renderer='templates/register.jinja2',
+                 request_method='POST')
+    def register_handler(self):
+        request = self.request
+        email = request.params['email']
+        if email:
+            headers = remember(request, email)
+            return HTTPFound(location=request.route_url('home'),
+                             headers=headers)
+
+        return dict(
+            form_error='Invalid email',
+            email=email,
+        )

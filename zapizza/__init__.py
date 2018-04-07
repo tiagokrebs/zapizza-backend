@@ -19,6 +19,7 @@ def main(global_config, **settings):
     config.add_route('home', '/')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('register', '/register')
 
     # To Do routes with route factory
     config.add_route('todos_list', '/todos',
