@@ -38,6 +38,8 @@ def main(global_config, **settings):
                      factory='.users.models.user_factory')
     config.add_route('users_add', '/users/add',
                      factory='.users.models.user_factory')
+    config.add_route('users_register', '/users/register',
+                     factory='.users.models.user_factory')
     config.add_route('users_view', '/users/{username}',
                      factory='.users.models.user_factory')
     config.add_route('users_edit', '/users/{username}/edit',
