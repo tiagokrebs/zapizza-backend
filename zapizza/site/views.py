@@ -23,13 +23,11 @@ class SiteViews:
 
     @view_config(route_name='home', renderer='templates/home.jinja2',
                  request_method='POST')
-    def register_handler(self):
+    def home_register_handler(self):
         request = self.request
         email = request.params['email']
         if email:
-            headers = remember(request, email)
-            return HTTPFound(location=request.route_url('home'),
-                             headers=headers)
+            return HTTPFound(location=request.route_url('users_register'))
 
         return dict(
             form_error='Invalid email',

@@ -19,6 +19,7 @@ def main(global_config, **settings):
     config.add_route('home', '/')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('register', '/register')
 
     # To Do routes with route factory
     config.add_route('todos_list', '/todos',
@@ -36,6 +37,8 @@ def main(global_config, **settings):
     config.add_route('users_list', '/users',
                      factory='.users.models.user_factory')
     config.add_route('users_add', '/users/add',
+                     factory='.users.models.user_factory')
+    config.add_route('users_register', '/users/register',
                      factory='.users.models.user_factory')
     config.add_route('users_view', '/users/{username}',
                      factory='.users.models.user_factory')

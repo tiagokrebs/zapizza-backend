@@ -36,6 +36,7 @@ def main(argv=sys.argv):
         for user in sample_users:
             u = User(
                 id=user['id'],
+                email=user['email'],
                 username=user['username'],
                 password=user['password'],
                 first_name=user['first_name'],
