@@ -1,0 +1,7 @@
+.fundo{background:radial-gradient(#F0623E, #732222);}
+.placewhite::placeholder{ color: white !important;}
+.navbar-brand.imglogo {
+background: url(logo_header.png) no-repeat center left;
+    background-size: auto 40px;}
+	
+.footer-content {background:#00000011}
