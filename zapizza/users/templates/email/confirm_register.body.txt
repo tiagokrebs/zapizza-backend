@@ -1,5 +1,9 @@
-Confirma aí no link
+Olá, ${first_name}
 
---
-Att
-Zapizza
+Obrigado por escolher o Zapizza, o sistema que caminha junto com sua pizzaria rumo ao sucesso. Seja bem-vindo e comece agora mesmo!
+
+Clique no link abaixo para confirmar seu cadastro
+${link}
+
+Tire suas dúvidas através do e-mail oi@zapizza.com.br
+Você está recebendo este e-mail porque se cadastrou no www.zapizza.com.br.

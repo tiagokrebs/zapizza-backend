@@ -1,50 +1,13 @@
 {% extends "base.jinja2" %}
 {% block title %}Registro {% endblock %}
 {% block content %}
-<div class="wrapper-content-sign-in ">
-  <div class="container text-center">
 
-    <h2>Registro</h2>
+<h1>Registro</h1>
 
-    <div class="col-md-6">
-      {% if form_error %}
-          <div class="alert alert-warning" role="alert">
-            {{ form_error }}
-          </div>
-      {% endif %}
-        <form method="POST">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input class="form-control" name="email"
-                       id="email" type="email"
-                       value="{{ email }}">
-            </div>
-            <div class="form-group">
-                <label for="nome">Nome</label>
-                <input class="form-control" name="nome"
-                       id="nome" value="{{ nome }}">
-            </div>
-            <div class="form-group">
-                <label for="sobrenome">Sobrenome</label>
-                <input class="form-control" name="sobrenome"
-                       id="sobrenome" value="{{ sobrenome }}">
-            </div>
-            <div class="form-group">
-                <label for="senha">Senha</label>
-                <input class="form-control" name="senha"
-                       id="senha" type="password"
-                       value="{{ senha }}">
-            </div>
-            <div class="form-group">
-                <label for="confsenha">Confirme a Senha</label>
-                <input class="form-control" name="confsenha"
-                       id="confsenha" type="password"
-                       value="{{ confsenha }}">
-            </div>
-            <button type="submit" class="btn btn-default">Registrar</button>
-        </form>
-    </div>
-	</div>
-	</div>
+{% if view.current_user.first_name %}
+<h1>{{ msg }}</h1>
+{% endif %}
+
+<div class="col-md-6">{{ register_form | safe }}</div>
 
 {% endblock %}

@@ -1,8 +1,5 @@
-from sqlalchemy.orm.exc import NoResultFound
-from pyramid_sqlalchemy import Session
-
 from ..users.models import User
-
+# todo: trocar para package user
 
 def groupfinder(username, request):
     groups = []

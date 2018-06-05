@@ -1,6 +1,7 @@
 import os
 import sys
 import transaction
+import datetime
 
 from pyramid.config import Configurator
 from pyramid_sqlalchemy import Session
@@ -41,7 +42,9 @@ def main(argv=sys.argv):
                 password=user['password'],
                 first_name=user['first_name'],
                 last_name=user['last_name'],
-                groups=user['groups']
+                groups=user['groups'],
+                register_date=datetime.datetime.now(),
+                register_confirm=datetime.datetime.now()
             )
             Session.add(u)
 
