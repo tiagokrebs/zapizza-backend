@@ -2,33 +2,33 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 <div class="wrapper-content-sign-in ">
-  <div class="container text-center">
-    {% if view.current_user %}
+    <div class="container text-center">
+        {% if view.current_user %}
         <h1>Bem Vindo ao Sistema caro {{ view.current_user.first_name }}</h1>
-    {% else %}
-	
-	
-	<div class="smallbox form-signin1">
-			                <div class="form-group">
-							 
-                  <h2>Registro</h2>
+        {% else %}
 
-        
-          {% if form_error %}
-              <div class="alert alert-warning" role="alert">
-                {{ form_error }}
-              </div>
-          {% endif %}
-            <form method="POST">
-                <div class="form-group">
-                    <input class="form-control placewhite" name="email" placeholder="E-mail" id="email" value="{{ email }}">
+
+        <div class="smallbox form-signin1">
+            <div class="form-group">
+
+                <h2>Registro</h2>
+
+
+                {% if form_error %}
+                <div class="alert alert-warning" role="alert">
+                    {{ form_error }}
                 </div>
-                <button type="submit" class="btn btn-primary btn-round">Registrar</button>
-            </form>
+                {% endif %}
+                <form method="POST">
+                    <div class="form-group">
+                        <input type="email" class="form-control placewhite" name="email" placeholder="E-mail" id="email" value="{{ email }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-round">Registrar</button>
+                </form>
+            </div>
+
         </div>
-		
-		</div>
-		</div>
-		</div>
-    {% endif %}
+    </div>
+</div>
+{% endif %}
 {% endblock %}

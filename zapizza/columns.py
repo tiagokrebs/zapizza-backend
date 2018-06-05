@@ -1,6 +1,6 @@
 """
-Common to all models.
-Quando em uso de base de dados SQLite metodo para interpretacao de array e necessario
+Comum a todos os modelos
+Quando em uso de base de dados SQLite método para interpretação de array é necessário
 """
 
 from sqlalchemy.types import (
@@ -11,10 +11,9 @@ import json
 
 
 class ArrayType(TypeDecorator):
-    """ Sqlite does not support arrays.
-        Let's use a custom type decorator.
-
-        See http://docs.sqlalchemy.org/en/latest/core/types.html#sqlalchemy.types.TypeDecorator
+    """ Sqlite não suporte array.
+        É utilizado um decorador de tipo customizado.
+        Ver http://docs.sqlalchemy.org/en/latest/core/types.html#sqlalchemy.types.TypeDecorator
     """
     impl = String
 
@@ -26,5 +25,3 @@ class ArrayType(TypeDecorator):
 
     def copy(self):
         return ArrayType(self.impl.length)
-
-

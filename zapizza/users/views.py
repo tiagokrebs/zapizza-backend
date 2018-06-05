@@ -1,17 +1,17 @@
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.view import (
     view_config,
     view_defaults
 )
 from pyramid.security import NO_PERMISSION_REQUIRED
-
+from pyramid.response import Response
 import colander
 from deform import Form, ValidationFailure
-
 from pyramid_sqlalchemy import Session
-
 from ..users.models import User
-
+from zapizza.email import send_async_templated_mail, send_templated_mail
+from ..site.token import generate_token
+from datetime import datetime, timedelta
 
 class UserSchema(colander.MappingSchema):
     email = colander.SchemaNode(colander.String())
@@ -83,7 +83,8 @@ class UserViews:
                  renderer='templates/register.jinja2',
                  permission=NO_PERMISSION_REQUIRED)
     def register(self):
-        return dict(register_form=self.register_form.render())
+        email = self.request.params['email']
+        return dict(register_form=self.register_form.render(dict(email=email)))
 
     @view_config(route_name='users_register',
                  renderer='templates/register.jinja2',
@@ -94,10 +95,10 @@ class UserViews:
         try:
             appstruct = self.register_form.validate(controls)
         except ValidationFailure as e:
-            # Formulário naão é válido
+            # Formulário não é válido
             return dict(register_form=e.render())
 
-        # Adiciona novo usuário e redireciona
+        # Adiciona novo usuário não confirmado e redireciona
         email = appstruct['email']
         username = appstruct['username']
         password = appstruct['password']
@@ -110,9 +111,23 @@ class UserViews:
             last_name=last_name, groups=groups
         ))
         user = User.by_username(username)
-        self.request.session.flash('Você está registrado, faça login com o seu nome de usuário ou email e senha')
-        url = self.request.route_url('login', id=user.username)
-        return HTTPFound(url)
+
+        # token expira em 24h, tipo registro, confirmado com email
+        token_data = {'exp': datetime.utcnow() + timedelta(days=1), 'aud':'registro', 'email':email}
+        token = generate_token(request=self.request, data=token_data)
+        confirm_url = self.request.route_url('confirm', token=token)
+
+        # envio de email de confirmação
+        send_async_templated_mail(request=self.request, recipients=email,
+                            template='users/templates/email/confirm_register',
+                            context=dict(
+                                first_name=first_name,
+                                link=confirm_url
+                            ))
+
+        if user:
+            msg = 'Verifique seu email para realizar a confirmação'
+            return dict(msg=msg, user=user)
 
     @view_config(route_name='users_view',
                  permission='view',

@@ -1,52 +1,65 @@
+"""
+Comum a todas as views
+Efetua envio de email avulso síncrono ou assíncrono
+
+todo: email.py deve pertencer ao package site
+todo: alterar para pyramid_email
+"""
+
+import smtplib
+import premailer
+from email.message import EmailMessage
+from threading import Thread
 from pyramid.renderers import render
 
-from pyramid_mailer import get_mailer
-from pyramid_mailer.message import Message
 
-import premailer
-
+def send_async_templated_mail(request, recipients, template, context, sender=None):
+    """Envia emails de forma assíncrona"""
+    thr = Thread(target=send_templated_mail, args=[request, recipients, template, context, sender])
+    thr.start()
 
 
 def send_templated_mail(request, recipients, template, context, sender=None):
-    """Send out templatized HTML and plain text emails.
-
-    The email is assembled from three different templates:
-
-    * Read subject from a subject specific template $template.subject.txt
-
-    * Generate HTML email from HTML template, $template.body.html
-
-    * Generate plain text email from HTML template, $template.body.txt
-
-    :param request: HTTP request, passed to the template engine. Request configuration is used to get hold of the configured mailer.
-
-    :param recipients: List of recipient emails
-
-    :param template: Template filename base string for template tripled (subject, HTML body, plain text body). For example ``email/my_message`` would map to templates ``email/my_message.subject.txt``, ``email/my_message.body.txt``, ``email/my_message.body.html``
-
-    :param context: Template context variables as a dict
-
-    :param sender: Override the sender email - if not specific use the default set in the config as ``mail.default_sender``
+    """Envia emails HTML a partir de templates e texto.
+    O email é rederizado a partir de três arquivos de template:
+    * Lê o assunto de um template especifico para o assunto $template.subject.txt
+    * Gera o email em HTML a partir de um template, $template.body.jinja2
+    * Gera o email em TXT a partir de um template, $template.body.txt
     """
-
 
     assert recipients
     assert len(recipients) > 0
 
     subject = render(template + ".subject.txt", context, request=request)
-    print(subject)
-    subject = subject.strip()
+    subject = subject.decode('utf-8')
 
-    html_body = render(template + ".body.html", context, request=request)
+    html_body = render(template + ".body.jinja2", context, request=request)
     text_body = render(template + ".body.txt", context, request=request)
+    text_body = text_body.decode('utf-8')
 
     if not sender:
         sender = request.registry.settings["mail.default_sender"]
 
+    host = request.registry.settings["mail.host"]
+    port = request.registry.settings["mail.port"]
+    user = request.registry.settings["mail.username"]
+    password = request.registry.settings["mail.password"]
+
     # Inline CSS styles
     html_body = premailer.transform(html_body)
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = recipients
+    msg.set_content(text_body)
+    msg.add_alternative(html_body, subtype='html')
 
-    message = Message(subject=subject, sender=sender, recipients=recipients, body=text_body, html=html_body)
 
-    mailer = get_mailer(request)
-    mailer.send(message)
+    # todo: implementar tratamento de exceções
+    server = smtplib.SMTP(host=host, port=port)
+    server.set_debuglevel(1)
+    server.ehlo()
+    server.starttls()  # todo: verificar padrão de email zapizza
+    server.login(user=user, password=password)
+    server.send_message(msg)
+    server.close()
