@@ -1,4 +1,4 @@
-from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember, forget
 from pyramid.view import (
     view_config,
@@ -8,7 +8,7 @@ from pyramid.view import (
 import re
 from ..users.models import User
 from ..site.token import confirm_token
-from zapizza.email import send_async_templated_mail
+from ..site.email import send_async_templated_mail
 from ..site.token import generate_token
 from datetime import datetime, timedelta
 from pyramid_sqlalchemy import Session
@@ -144,7 +144,7 @@ class SiteViews:
 
         # envio de email de confirmação
         send_async_templated_mail(request=self.request, recipients=email,
-                                  template='users/templates/email/confirm_register',
+                                  template='templates/email/confirm_register',
                                   context=dict(
                                       first_name=fname,
                                       link=confirm_url

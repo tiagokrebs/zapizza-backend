@@ -35,7 +35,6 @@ def main(global_config, **settings):
                      factory='.todos.models.todo_factory')
 
     # User routes with route factory
-    #config.add_route('users_register', '/users/register')
     config.add_route('users_list', '/users',
                      factory='.users.models.user_factory')
     config.add_route('users_add', '/users/add',
