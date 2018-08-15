@@ -79,6 +79,7 @@ class UserViews:
         url = self.request.route_url('users_list', id=user.username)
         return HTTPFound(url)
 
+    """
     @view_config(route_name='users_register',
                  renderer='templates/register.jinja2',
                  permission=NO_PERMISSION_REQUIRED)
@@ -128,6 +129,7 @@ class UserViews:
         if user:
             msg = 'Verifique seu email para realizar a confirmação'
             return dict(msg=msg, user=user)
+            """
 
     @view_config(route_name='users_view',
                  permission='view',

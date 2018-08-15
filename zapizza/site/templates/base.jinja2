@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+{# base principal #}
+{# contém a barra superior, corpo e rodapé principais do site #}
+{# diversos IFs exibem o conteúdo de acordo com a existência de um usuário corrente #}
+
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -20,7 +23,7 @@
         <ul class="navbar-nav  justify-content-end">
 		{% if view.current_user %}
               <li>
-                  <a href="{{ request.route_url('users_view',username=view.current_user.username) }}"class="btn btn-link text-white">
+                  <a href="{{ request.route_url('users_view',username=view.current_user.username) }}" class="btn btn-link text-white">
                     {{ view.current_user.first_name }}
                     {{ view.current_user.last_name }}
                   </a></li>
@@ -29,7 +32,7 @@
               </li>
           {% else %}
               <li>
-                  <a href="{{ request.route_url('login') }}"class="btn btn-primary ">Login</a>
+                  <a href="{{ request.route_url('login') }}" class="btn btn-primary ">Login</a>
               </li>
           {% endif %}
           

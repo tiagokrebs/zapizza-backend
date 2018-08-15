@@ -11,6 +11,8 @@ from ..site.token import confirm_token
 from zapizza.email import send_async_templated_mail
 from ..site.token import generate_token
 from datetime import datetime, timedelta
+from pyramid_sqlalchemy import Session
+
 
 class SiteViews:
     def __init__(self, context, request):
@@ -42,7 +44,8 @@ class SiteViews:
                 )
             # redireciona para página de registro
             else:
-                return HTTPFound(location=request.route_url('users_register', _query=dict(email=email)))
+                # return HTTPFound(location=request.route_url('users_register', _query=dict(email=email)))
+                return HTTPFound(location=request.route_url('register', _query=dict(email=email)))
 
         # retorna apenas mensagem
         return dict(
@@ -107,6 +110,50 @@ class SiteViews:
         url = self.request.route_url('home')
         return HTTPFound(location=url, headers=headers)
 
+    @view_config(route_name='register', renderer='templates/register.jinja2')
+    def register(self):
+        email = self.request.params['email']
+        return dict(email=email)
+
+    @view_config(route_name='register', renderer='templates/register.jinja2',
+                 request_method='POST')
+    def register_handler(self):
+        request = self.request
+        email = request.params['email']
+        username = request.params['username']
+        password = request.params['password']
+        cpassword = request.params['cpassword']
+        fname = request.params['fname']
+        lname = request.params['lname']
+
+        # validações de obrigatoriedade
+        # validação de senha confirmada
+
+        groups = ['group:admins', 'group:editors']
+        Session.add(User(
+            email=email, username=username,
+            password=password, first_name=fname,
+            last_name=lname, groups=groups
+        ))
+        user = User.by_username(username)
+
+        # token expira em 24h, tipo registro, confirmado com email
+        token_data = {'exp': datetime.utcnow() + timedelta(days=1), 'aud': 'registro', 'email': email}
+        token = generate_token(request=self.request, data=token_data)
+        confirm_url = self.request.route_url('confirm', token=token)
+
+        # envio de email de confirmação
+        send_async_templated_mail(request=self.request, recipients=email,
+                                  template='users/templates/email/confirm_register',
+                                  context=dict(
+                                      first_name=fname,
+                                      link=confirm_url
+                                  ))
+
+        if user:
+            msg = 'Verifique seu email para realizar a confirmação'
+            return dict(msg=msg, user=user)
+
     @view_config(route_name='confirm',
                  permission='super',
                  renderer='templates/confirm.jinja2')
@@ -132,7 +179,6 @@ class SiteViews:
                 # registra usuário e direciona para home
                 self.current_user.register_confirm = datetime.utcnow()
                 return dict(form_alert='Registro efetuado com sucesso')
-
 
         """ 
         Solicitação de reenvio de token para email registrado anteriormente

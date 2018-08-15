@@ -18,7 +18,7 @@ def main(global_config, **settings):
     config.add_route('home', '/')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
-    # config.add_route('register', '/register')
+    config.add_route('register', '/register')
     config.add_route('confirm', '/confirm/{token}',
                      factory='.users.models.user_factory')
 
@@ -35,7 +35,7 @@ def main(global_config, **settings):
                      factory='.todos.models.todo_factory')
 
     # User routes with route factory
-    config.add_route('users_register', '/users/register')
+    #config.add_route('users_register', '/users/register')
     config.add_route('users_list', '/users',
                      factory='.users.models.user_factory')
     config.add_route('users_add', '/users/add',
