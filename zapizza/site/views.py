@@ -44,8 +44,7 @@ class SiteViews:
                 )
             # redireciona para página de registro
             else:
-                # return HTTPFound(location=request.route_url('users_register', _query=dict(email=email)))
-                return HTTPFound(location=request.route_url('register', _query=dict(email=email)))
+                return HTTPFound(location=request.route_url('register', _query=dict(new=email)))
 
         # retorna apenas mensagem
         return dict(
@@ -62,7 +61,7 @@ class SiteViews:
         """
         Ao encontrar uma rota não autorizada usuário é direcionado para /login
         Origem da requisição é armazenada em came_from como input hiden em template de login
-        Após o login caso efetuado com sucesso a url de came_from é utilizada ao invé de /home
+        Após o login caso efetuado com sucesso a url de came_from é utilizada ao invés de /home
         """
         request = self.request
         login_url = request.route_url('login')
@@ -112,7 +111,7 @@ class SiteViews:
 
     @view_config(route_name='register', renderer='templates/register.jinja2')
     def register(self):
-        email = self.request.params['email']
+        email = self.request.params['new']
         return dict(email=email)
 
     @view_config(route_name='register', renderer='templates/register.jinja2',
@@ -126,8 +125,33 @@ class SiteViews:
         fname = request.params['fname']
         lname = request.params['lname']
 
-        # validações de obrigatoriedade
-        # validação de senha confirmada
+        # verifica existência de email
+        if not email:
+            form_error='Informe um e-mail'
+            return dict(form_error=form_error)
+        # verifica uso de email por usuário existente
+        if User.by_username(email):
+            return dict(
+                form_error='O e-mail informado já está cadastrado',
+                email=email,
+            )
+        # verifica regex mínimo para email
+        elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            return dict(
+                form_error='Informe um e-mail válido',
+                email=email,
+            )
+        # verifica existência de username
+        # verifica uso de username por usuário existente
+        # verifica regex mínimo para username
+        # verifica existência de password
+        # verifica regex mínimo para password
+        # verifica existência de cpassword
+        # verifia igualdadade entre passwords
+        # verifica existência de fname
+        # verifica regex mínimo para fname
+        # verifica existência de lname
+        # verifica regex mínimo para lname
 
         groups = ['group:admins', 'group:editors']
         Session.add(User(
@@ -151,8 +175,8 @@ class SiteViews:
                                   ))
 
         if user:
-            msg = 'Verifique seu email para realizar a confirmação'
-            return dict(msg=msg, user=user)
+            form_error = 'Verifique seu email para realizar a confirmação'
+            return dict(form_error=form_error, user=user)
 
     @view_config(route_name='confirm',
                  permission='super',

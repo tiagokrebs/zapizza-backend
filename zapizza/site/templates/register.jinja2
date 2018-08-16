@@ -12,9 +12,9 @@
                 <h2>Registro</h2>
 
 
-                {% if msg %}
+                {% if form_error %}
                 <div class="alert alert-warning" role="alert">
-                    {{ msg }}
+                    {{ form_error }}
                     {% endif %}
 
                     <form method="POST">
