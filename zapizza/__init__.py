@@ -24,6 +24,8 @@ def main(global_config, **settings):
     config.add_route('confirm', '/confirm/{token}',
                      factory='.users.models.user_factory')
     config.add_route('forgot', '/forgot')
+    config.add_route('reset', '/reset/{token}',
+                     factory='.users.models.user_factory')
 
     # To Do routes with route factory
     config.add_route('todos_list', '/todos',

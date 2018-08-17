@@ -266,7 +266,6 @@ class SiteViews:
                 if self.current_user.register_confirm:
                     url = self.request.route_url('home')
                     return HTTPFound(url)
-
                 # registra usuário e direciona para home
                 self.current_user.register_confirm = datetime.utcnow()
                 return dict(form_alert='Registro efetuado com sucesso')
@@ -300,7 +299,7 @@ class SiteViews:
         return dict(form_alert='Token inválido')
 
     @view_config(route_name='forgot',
-                renderer='templates/forgot.jinja2')
+                 renderer='templates/forgot.jinja2')
     def forgot(self):
         return dict()
 
@@ -325,20 +324,83 @@ class SiteViews:
             else:
                 user = User.by_username(email)
 
-                # token expira em 24h, tipo registro, confirmado com email
-                token_data = {'exp': datetime.utcnow() + timedelta(days=1), 'aud': 'senha', 'email': email}
+                # token expira em 1h, tipo registro, confirmado com email
+                token_data = {'exp': datetime.utcnow() + timedelta(hours=1), 'aud': 'senha', 'email': email}
                 token = generate_token(request=self.request, data=token_data)
-                confirm_url = self.request.route_url('confirm', token=token)
+                reset_url = self.request.route_url('reset', token=token)
 
                 # envio de email de confirmação
                 send_async_templated_mail(request=self.request, recipients=email,
                                           template='templates/email/forgot_password',
                                           context=dict(
                                               first_name=user.first_name,
-                                              link=confirm_url
+                                              link=reset_url
                                           ))
 
                 if user:
                     form_error = 'Verifique seu email para realizar a recuperação da senha'
                     return dict(form_error=form_error, user=user)
 
+    @view_config(route_name='reset',
+                 renderer='templates/reset.jinja2')
+    def reset(self):
+        """
+        Validação de token de cofirmação de recuperação de senha do usuário
+        Caso o token seja válido o usuário é confirmado e redirecionado para a página de recuperação
+        Caso o token esteja vencido um alerta é exibido
+        """
+        token = self.request.matchdict.get('token')
+        token_data = confirm_token(request=self.request, token=token, audience='senha')
+        if token_data:
+            aud = token_data['aud']
+            email = token_data['email']
+            user = User.by_username(email)
+            if user and aud == 'senha':
+                # direciona para página de recuperação de senha
+                return dict()
+
+        return dict(form_block='Token inválido')
+
+    @view_config(route_name='reset',
+                 renderer='templates/reset.jinja2',
+                 request_method='POST')
+    def reset_handler(self):
+        """
+        Ao receber confirmação da recuperação de senha valida os dados
+        define password no registro do usuário e direciona para página de login
+        """
+        if 'form.submitted' in self.request.params:
+            token = self.request.matchdict.get('token')
+            token_data = confirm_token(request=self.request, token=token, audience='senha')
+            if token_data:
+                aud = token_data['aud']
+                email = token_data['email']
+                user = User.by_username(email)
+                password = self.request.params['password']
+                cpassword = self.request.params['cpassword']
+
+                if user and aud == 'senha':
+                    # verifica existência de password
+                    if not password:
+                        return dict(form_error='Informe um password')
+
+                    # verifica regex mínimo para password
+                    if not re.match(r".{6,120}", password):
+                        return dict(form_error='Informe um passord contendo no mínimo 6 caracteres')
+
+                    # verifica existência de cpassword
+                    if not cpassword:
+                        return dict(form_error='Informe a confirmação do password')
+
+                    # verifia igualdadade entre passwords
+                    if cpassword != password:
+                        return dict(form_error='A confirmação do password incorreta')
+
+                    # ajusta password no registro e direciona
+                    #Session.query(user).filter(user.email == email). \
+                    #    update({user.password: password}, synchorize_session=False)
+                    user.password = password
+                    url = self.request.route_url('login')
+                    return HTTPFound(url)
+
+        return dict(form_error='Token inválido')
