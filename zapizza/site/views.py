@@ -294,8 +294,51 @@ class SiteViews:
                                               first_name=self.current_user.first_name,
                                               link=confirm_url
                                           ))
-                return dict(form_alert='Email de confirmação enviado')
             else:
                 return dict(form_alert='Email não registrado')
 
         return dict(form_alert='Token inválido')
+
+    @view_config(route_name='forgot',
+                renderer='templates/forgot.jinja2')
+    def forgot(self):
+        return dict()
+
+    @view_config(route_name='forgot', renderer='templates/forgot.jinja2',
+                 request_method='POST')
+    def forgot_handler(self):
+        request = self.request
+        email = request.params['email']
+        if not email:
+            return dict(
+                form_error='Informe um e-mail',
+                email=email
+            )
+        else:
+            # verifica se o email informado existe
+            if not User.by_username(email):
+                return dict(
+                    form_error='E-mail informado não encontrado',
+                    email=email,
+                )
+            # envia email de confirmação de senha com token
+            else:
+                user = User.by_username(email)
+
+                # token expira em 24h, tipo registro, confirmado com email
+                token_data = {'exp': datetime.utcnow() + timedelta(days=1), 'aud': 'senha', 'email': email}
+                token = generate_token(request=self.request, data=token_data)
+                confirm_url = self.request.route_url('confirm', token=token)
+
+                # envio de email de confirmação
+                send_async_templated_mail(request=self.request, recipients=email,
+                                          template='templates/email/forgot_password',
+                                          context=dict(
+                                              first_name=user.first_name,
+                                              link=confirm_url
+                                          ))
+
+                if user:
+                    form_error = 'Verifique seu email para realizar a recuperação da senha'
+                    return dict(form_error=form_error, user=user)
+

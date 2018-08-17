@@ -15,12 +15,15 @@ def main(global_config, **settings):
     metadata.create_all()
     config.add_static_view(name='deform_static', path='deform:static')
     config.add_static_view(name='static', path='zapizza.site:static')
+
+    # Site routes
     config.add_route('home', '/')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('register', '/register')
     config.add_route('confirm', '/confirm/{token}',
                      factory='.users.models.user_factory')
+    config.add_route('forgot', '/forgot')
 
     # To Do routes with route factory
     config.add_route('todos_list', '/todos',

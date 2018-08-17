@@ -16,28 +16,29 @@
                 <div class="alert alert-warning" role="alert">
                     {{ form_error }}
                 </div>
-                    {% endif %}
+                {% endif %}
 
-                    <form method="POST">
-                        <input type="hidden" name="came_from" value="{{ came_from }}"/>
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input class="form-control" name="username"
-                                   id="username" value="{{ username }}">
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" class="form-control"
-                                   name="password"
-                                   id="password" value="{{ password }}">
-                        </div>
-                        <button type="submit" name="form.submitted" class="btn btn-primary btn-round">Entrar</button>
-                    </form>
-                </div>
+                <form method="POST">
+                    <input type="hidden" name="came_from" value="{{ came_from }}"/>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input class="form-control" name="username"
+                               id="username" value="{{ username }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control"
+                               name="password"
+                               id="password" value="{{ password }}">
+                    </div>
+                    <button type="submit" name="form.submitted" class="btn btn-primary btn-round">Entrar</button>
+                </form>
+                <a href="{{ request.route_url('forgot') }}" class="btn btn-link text-white">Esqueci a senha</a>
             </div>
         </div>
     </div>
+</div>
 
 
 
-    {% endblock %}
+{% endblock %}
