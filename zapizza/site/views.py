@@ -205,7 +205,7 @@ class SiteViews:
             )
 
         # verifica regex mínimo para fname
-        if not re.match(r"[a-zA-Z ]{3,120}", fname):
+        if fname and not re.match(r"[a-zA-Z ]{3,120}", fname):
             return dict(
                 form_error='Primeiro nome inválido',
                 email=email,
@@ -213,7 +213,7 @@ class SiteViews:
             )
 
         # verifica regex mínimo para lname
-        if not re.match(r"[a-zA-Z ]{3,120}", lname):
+        if lname and not re.match(r"[a-zA-Z ]{3,120}", lname):
             return dict(
                 form_error='Último nome inválido',
                 email=email,
