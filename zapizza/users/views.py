@@ -24,7 +24,6 @@ class UserViews:
         self.request = request
         self.add_schema = UserSchema()
         self.add_form = Form(self.add_schema, buttons=('submit',))
-        self.register_form = Form(self.register_schema, buttons=('submit',))
         self.messages = request.session.pop_flash()
         self.current_user = User.by_username(request.authenticated_userid)
 

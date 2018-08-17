@@ -15,6 +15,7 @@
                 {% if form_error %}
                 <div class="alert alert-warning" role="alert">
                     {{ form_error }}
+                </div>
                     {% endif %}
 
                     <form method="POST">
@@ -30,13 +31,13 @@
                                    name="password"
                                    id="password" value="{{ password }}">
                         </div>
-                        <button type="submit" name="form.submitted" class="btn btn-primary btn-round">Submit</button>
+                        <button type="submit" name="form.submitted" class="btn btn-primary btn-round">Entrar</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
 
 
     {% endblock %}

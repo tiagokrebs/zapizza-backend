@@ -127,31 +127,98 @@ class SiteViews:
 
         # verifica existência de email
         if not email:
-            form_error='Informe um e-mail'
-            return dict(form_error=form_error)
+            return dict(
+                form_error='Informe um e-mail', email=email,
+                username=username, fname=fname, lname=lname
+                )
+
         # verifica uso de email por usuário existente
         if User.by_username(email):
             return dict(
                 form_error='O e-mail informado já está cadastrado',
                 email=email,
+                username=username, fname=fname, lname=lname
             )
+
         # verifica regex mínimo para email
-        elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             return dict(
                 form_error='Informe um e-mail válido',
                 email=email,
+                username=username, fname=fname, lname=lname
             )
+
         # verifica existência de username
+        if not username:
+            return dict(
+                form_error='Informe um usernamme',
+                email=email,
+                username=username, fname=fname, lname=lname
+            )
+
         # verifica uso de username por usuário existente
+        if User.by_username(username):
+            return dict(
+                form_error='O username informado já está cadastrado',
+                email=email,
+                username=username, fname=fname, lname=lname
+            )
+
         # verifica regex mínimo para username
+        if not re.match(r"[a-zA-Z0-9]{3,120}", username):
+            return dict(
+                form_error='Username inválido',
+                email=email,
+                username=username, fname=fname, lname=lname
+            )
+
         # verifica existência de password
+        if not password:
+            return dict(
+                form_error='Informe um password',
+                email=email,
+                username=username, fname=fname, lname=lname
+            )
+
         # verifica regex mínimo para password
+        if not re.match(r".{6,120}", password):
+            return dict(
+                form_error='Informe um passord contendo no mínimo 6 caracteres',
+                email=email,
+                username=username, fname=fname, lname=lname
+            )
+
         # verifica existência de cpassword
+        if not cpassword:
+            return dict(
+                form_error='Informe a confirmação do password',
+                email=email,
+                username=username, fname=fname, lname=lname
+            )
+
         # verifia igualdadade entre passwords
-        # verifica existência de fname
+        if cpassword != password:
+            return dict(
+                form_error='A confirmação do password incorreta',
+                email=email,
+                username=username, fname=fname, lname=lname
+            )
+
         # verifica regex mínimo para fname
-        # verifica existência de lname
+        if not re.match(r"[a-zA-Z ]{3,120}", fname):
+            return dict(
+                form_error='Primeiro nome inválido',
+                email=email,
+                username=username, fname=fname, lname=lname
+            )
+
         # verifica regex mínimo para lname
+        if not re.match(r"[a-zA-Z ]{3,120}", lname):
+            return dict(
+                form_error='Último nome inválido',
+                email=email,
+                username=username, fname=fname, lname=lname
+            )
 
         groups = ['group:admins', 'group:editors']
         Session.add(User(
