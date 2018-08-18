@@ -1,33 +1,31 @@
 {% extends "base.jinja2" %}
 {% block title %}Confirm {% endblock %}
 {% block content %}
-{% if view.current_user.register_confirm %}
-<br>
-<br>
-<br>
-{% if form_alert %}
-<div class="alert alert-warning" role="alert">
-    {{ form_alert }}
-    {% endif %}
-</div>
-<h1>Bem Vindo ao Sistema caro {{ view.current_user.first_name }}</h1>
-<h2>Vamo dale</h2>
-{% else %}
-<br>
-<br>
-<br>
-{% if view.current_user %}
-{% if form_alert %}
-<div class="alert alert-warning" role="alert">
-    {{ form_alert }}
-    {% endif %}
-</div>
-<form method="POST">
-    <div class="form-group">
-        <input type="email" class="form-control placewhite" name="email" placeholder="E-mail" id="email" value="{{ view.current_user.email }}">
+<div class="wrapper-content-sign-in ">
+    <div class="container text-center">
+        {% if view.current_user.register_confirm %}
+        {% if form_alert %}
+        <div class="alert alert-warning" role="alert">
+            {{ form_alert }}
+            {% endif %}
+        </div>
+        <h1>Bem Vindo ao Sistema caro {{ view.current_user.first_name }}</h1>
+        <h2>Vamo dale</h2>
+        {% else %}
+        {% if view.current_user %}
+        {% if form_alert %}
+        <div class="alert alert-warning" role="alert">
+            {{ form_alert }}
+            {% endif %}
+        </div>
+        <form method="POST">
+            <div class="form-group">
+                <input type="email" class="form-control placewhite" name="email" placeholder="E-mail" id="email" value="{{ view.current_user.email }}">
+            </div>
+            <button type="submit" name="resend.submitted" class="btn btn-primary btn-round">Enviar</button>
+        </form>
+        {% endif%}
+        {% endif%}
     </div>
-    <button type="submit" name="resend.submitted" class="btn btn-primary btn-round">Enviar</button>
-</form>
-{% endif%}
-{% endif%}
+</div>
 {% endblock %}

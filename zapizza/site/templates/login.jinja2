@@ -4,20 +4,16 @@
 {% extends "base.jinja2" %}
 {% block title %}Login {% endblock %}
 {% block content %}
-
 <div class="wrapper-content-sign-in ">
     <div class="container text-center">
         <div class="smallbox form-signin1">
             <div class="form-group">
                 <h2>Login</h2>
-
-
                 {% if form_error %}
                 <div class="alert alert-warning" role="alert">
                     {{ form_error }}
                 </div>
                 {% endif %}
-
                 <form method="POST">
                     <input type="hidden" name="came_from" value="{{ came_from }}"/>
                     <div class="form-group">

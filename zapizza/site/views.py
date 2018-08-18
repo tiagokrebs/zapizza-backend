@@ -204,10 +204,26 @@ class SiteViews:
                 username=username, fname=fname, lname=lname
             )
 
+        # verifica existência de fname
+        if not fname:
+            return dict(
+                form_error='Informe o primeiro nome',
+                email=email,
+                username=username, fname=fname, lname=lname
+            )
+
         # verifica regex mínimo para fname
         if fname and not re.match(r"[a-zA-Z ]{3,120}", fname):
             return dict(
                 form_error='Primeiro nome inválido',
+                email=email,
+                username=username, fname=fname, lname=lname
+            )
+
+        # verifica existência de lname
+        if not lname:
+            return dict(
+                form_error='Informe o último nome',
                 email=email,
                 username=username, fname=fname, lname=lname
             )

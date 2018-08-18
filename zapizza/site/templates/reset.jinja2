@@ -4,14 +4,11 @@
 {% extends "base.jinja2" %}
 {% block title %}Recuperar a Senha {% endblock %}
 {% block content %}
-
 <div class="wrapper-content-sign-in ">
     <div class="container text-center">
         <div class="smallbox form-signin1">
             <div class="form-group">
                 <h2>Recuperar Senha</h2>
-
-
                 {% if form_block %}
                 <div class="alert alert-warning" role="alert">
                     {{ form_block }}
@@ -42,7 +39,4 @@
         </div>
     </div>
 </div>
-
-
-
 {% endblock %}

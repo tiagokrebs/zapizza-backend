@@ -4,20 +4,16 @@
 {% extends "base.jinja2" %}
 {% block title %}Registro{% endblock %}
 {% block content %}
-
 <div class="wrapper-content-sign-in ">
     <div class="container text-center">
         <div class="smallbox form-signin1">
             <div class="form-group">
                 <h2>Registro</h2>
-
-
                 {% if form_error %}
                 <div class="alert alert-warning" role="alert">
                     {{ form_error }}
                 </div>
                 {% endif %}
-
                 <form method="POST">
                     <div class="form-group">
                         <label for="email">E-mail</label>
@@ -57,6 +53,4 @@
         </div>
     </div>
 </div>
-
-
 {% endblock %}

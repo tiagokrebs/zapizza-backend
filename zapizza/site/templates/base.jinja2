@@ -1,62 +1,60 @@
 {# base principal #}
-{# contém a barra superior, corpo e rodapé principais do site #}
+{# contém a estutura principal do site composta por header, section e footer #}
 {# diversos IFs exibem o conteúdo de acordo com a existência de um usuário corrente #}
 
-<html lang="en">
+<!DOCTYPE html>
+<html>
+
 <head>
-    <meta charset="utf-8">
+    {% block head %}
+    <link rel="shortcut icon" href="{{ request.static_url('zapizza.site:static/favicon.png') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/bootstrap.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/lightbrownsidebar.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/login.css') }}">
     <title>{% block title %}{% endblock %} - Zapizza</title>
-   <link rel="shortcut icon" href="{{ request.static_url('zapizza.site:static/favicon.png') }}">
-	<link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/bootstrap.css') }}" type="text/css">
-	<link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/lightbrownsidebar.css') }}">
-	<link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/login.css') }}">
-	
-	
-	
+    {% endblock %}
 </head>
+
 <body class="menuclose menuclose-right fundo">
+
 <header class="navbar-fixed">
+    {% block header %}
     <nav class="navbar navbar-toggleable-md sign-in-header">
-    <div class="sidebar-left">  <a class="navbar-brand imglogo" href="{{ request.route_url('home') }}"></a> </div>
-      <div class="col"></div>
-      <div class="sidebar-right pull-right" >
-        <ul class="navbar-nav  justify-content-end">
-		{% if view.current_user %}
-              <li>
-                  <a href="{{ request.route_url('users_view',username=view.current_user.username) }}" class="btn btn-link text-white">
-                    {{ view.current_user.first_name }}
-                    {{ view.current_user.last_name }}
-                  </a></li>
-              <li>
-                  <a href="{{ request.route_url('logout') }}" class="btn btn-link text-white">Logout</a>
-              </li>
-          {% else %}
-              <li>
-                  <a href="{{ request.route_url('login') }}" class="btn btn-primary ">Login</a>
-              </li>
-          {% endif %}
-          
-        </ul>
-      </div>
+        <div class="sidebar-left">  <a class="navbar-brand imglogo" href="{{ request.route_url('home') }}"></a> </div>
+        <div class="col"></div>
+        <div class="sidebar-right pull-right" >
+            <ul class="navbar-nav  justify-content-end">
+                {% if view.current_user %}
+                <li>
+                    <a href="" class="btn btn-link text-white">
+                        {{ view.current_user.first_name }}
+                        {{ view.current_user.last_name }}
+                    </a></li>
+                <li>
+                    <a href="{{ request.route_url('logout') }}" class="btn btn-link text-white">Logout</a>
+                </li>
+                {% else %}
+                <li>
+                    <a href="{{ request.route_url('login') }}" class="btn btn-primary ">Login</a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </div>
     </nav>
+    {% endblock %}
 </header>
 
+<section>
+    {% block content %}
+    {% endblock %}
+</section>
 
-  {% if view.messages %}
-    {% for message in view.messages %}
-        <div class="alert alert-info">
-          {{ message }}
-        </div>
-    {% endfor %}
-  {% endif %}
+<footer class="footer-content row  justify-content-between align-items-right">
+    {% block footer %}
+    <div class="col-sm-16 text-right"><a href="#" target="_blank" class="">Política de Privacidade</a> | <a href="#" target="_blank" class="">Termos de uso</a> </div>
+    {% endblock %}
+</footer>
 
-  {% block content %}{% endblock %}
-
-  <footer class="footer-content row  justify-content-between align-items-right">
-     <div class="col-sm-16 text-right"><a href="#" target="_blank" class="">Política de Privacidade</a> | <a href="#" target="_blank" class="">Termos de uso</a> </div>
-  </footer>
-  
-  
-<script src="//oss.maxcdn.com/jquery/2.1.3/jquery.js"></script>
 </body>
 </html>
