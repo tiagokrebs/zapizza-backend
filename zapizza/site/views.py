@@ -282,9 +282,28 @@ class SiteViews:
                 if self.current_user.register_confirm:
                     url = self.request.route_url('home')
                     return HTTPFound(url)
+                # retorna página de confirmação com termos de aceite
+                return dict()
+
+        return dict(form_alert='Token inválido', invalid_token='true')
+
+    @view_config(route_name='confirm',
+                 permission='super',
+                 renderer='templates/confirm.jinja2',
+                 request_method='POST')
+    def confirm_handler(self):
+        """
+        Confirmação dos termos de aceite registra o usuário e gera aviso 
+        """
+        if 'confirm.submitted' in self.request.params:
+            check = self.request.params.getall("aceito")
+            if check[0] == 'aceito':
                 # registra usuário e direciona para home
                 self.current_user.register_confirm = datetime.utcnow()
-                return dict(form_alert='Registro efetuado com sucesso')
+                url = self.request.route_url('home')
+                return HTTPFound(url)
+
+            return dict(form_alert='Você precisa aceitar os termos e condições')
 
         """ 
         Solicitação de reenvio de token para email registrado anteriormente
@@ -311,8 +330,6 @@ class SiteViews:
                                           ))
             else:
                 return dict(form_alert='Email não registrado')
-
-        return dict(form_alert='Token inválido')
 
     @view_config(route_name='forgot',
                  renderer='templates/forgot.jinja2')
