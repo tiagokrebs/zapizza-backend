@@ -111,7 +111,10 @@ class SiteViews:
 
     @view_config(route_name='register', renderer='templates/register.jinja2')
     def register(self):
-        email = self.request.params['new']
+        try:
+            email = self.request.params['new']
+        except:
+            return dict()
         return dict(email=email)
 
     @view_config(route_name='register', renderer='templates/register.jinja2',
