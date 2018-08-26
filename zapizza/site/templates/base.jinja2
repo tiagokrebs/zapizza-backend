@@ -1,62 +1,252 @@
 {# base principal #}
-{# contém a estutura principal do site composta por header, section e footer #}
+{# contém a estutura principal do site composta por header, conteúdo e footer #}
 {# diversos IFs exibem o conteúdo de acordo com a existência de um usuário corrente #}
+{# utilizar comentários tipo Jinja2, são ocultados quando o layout é renderizado #}
 
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 
 <head>
     {% block head %}
-    <link rel="shortcut icon" href="{{ request.static_url('zapizza.site:static/favicon.png') }}">
-    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/bootstrap.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/lightbrownsidebar.css') }}">
-    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/login.css') }}">
-    <title>{% block title %}{% endblock %} - Zapizza</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    {# favicon #}
+    <link rel="icon" href="{{ request.static_url('zapizza.site:static/favicon.png') }}">
+    {# vendor #}
+    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/vendor/font-awesome-4.7.0/css/font-awesome.min.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/vendor/bootstrap4alpha/css/bootstrap.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/vendor/datatables/css/dataTables.bootstrap4.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/vendor/datatables/css/responsive.dataTables.min.css') }}">
+    {# css #}
+    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/css/dark_brown_adminux.css') }}">
+
+    <title> Zapizza {% block title %}{% endblock %}</title>
     {% endblock %}
 </head>
 
-<body class="menuclose menuclose-right fundo">
+<body class="menuclose menuclose-right">
 
+{# page loader #}
+<div class="loader_wrapper inner align-items-center text-center">
+    <div class="load7 load-wrapper">
+        <div class="loading_img"></div>
+        <div class="loader"> Carregando... </div>
+        <div class="clearfix"></div>
+    </div>
+</div>
+
+{# header #}
+{# contem barra superior #}
+{# varia de acordo com a existencia de um usuario logado (if view.current_user) #}
 <header class="navbar-fixed">
     {% block header %}
-    <nav class="navbar navbar-toggleable-md sign-in-header">
-        <div class="sidebar-left">  <a class="navbar-brand imglogo" href="{{ request.route_url('home') }}"></a> </div>
-        <div class="col"></div>
-        <div class="sidebar-right pull-right" >
-            <ul class="navbar-nav justify-content-end">
-                <li>
-                    {% if view.current_user %}
-                    <a href="" class="btn btn-link text-white">
+    <nav class="navbar navbar-toggleable-md navbar-inverse bg-faded sign-in-header">
+
+        {# logo + link home #}
+        <div class="sidebar-left pl-2 pt-1">
+            <a class="navbar-brand imglogo" href="{{ request.route_url('home') }}"></a>
+            {% if view.current_user %}
+            <button class="btn btn-link icon-header mr-sm-2 pull-right menu-collapse" >
+                <span class="fa fa-bars"></span>
+            </button>
+            {% endif %}
+        </div>
+
+        {# superior direito + alertas #}
+        <div class="d-flex mr-auto"> </div>
+        {% if view.current_user %}
+        <ul class="navbar-nav content-right">
+            <li class="v-devider"></li>
+            {# mensagens #}
+            <li class="nav-item active">
+                <button class="btn btn-link icon-header "  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-envelope-o"></span> <span class="badge-number bg-success"></span></button>
+                <div class="dropdown-menu message-container">
+                    <div class="list-unstyled"> <a href="#" class="media"> <span class="message_userpic"><img class="d-flex" src="{{ request.static_url('zapizza.site:static/img/user-header.png') }}" alt="Generic user image"></span>
+                        <div class="media-body">
+                            <h6 class="mt-0 mb-1">Dhananjay Chauhan</h6>
+                            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. </div>
+                    </a> <a href="#" class="media"> <span class="message_userpic"><img class="d-flex" src="{{ request.static_url('zapizza.site:static/img/user-header.png') }}" alt="Generic user image"></span>
+                        <div class="media-body">
+                            <h6 class="mt-0 mb-1">Max Smith</h6>
+                            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. </div>
+                    </a> <a href="#" class="media"> <span class="message_userpic"><img class="d-flex" src="{{ request.static_url('zapizza.site:static/img/user-header.png') }}" alt="Generic user image"></span>
+                        <div class="media-body">
+                            <h6 class="mt-0 mb-1">Astha Smith</h6>
+                            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. </div>
+                    </a> <a href="#" class="media"> <span class="message_userpic"><img class="d-flex" src="{{ request.static_url('zapizza.site:static/img/user-header.png') }}" alt="Generic user image"></span>
+                        <div class="media-body">
+                            <h6 class="mt-0 mb-1">Tommy Cruszii</h6>
+                            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. </div>
+                    </a> <a href="#" class="media"> <span class="message_userpic"><img class="d-flex" src="{{ request.static_url('zapizza.site:static/img/user-header.png') }}" alt="Generic user image"></span>
+                        <div class="media-body">
+                            <h6 class="mt-0 mb-1">Max Smith</h6>
+                            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. </div>
+                    </a> </div>
+                </div>
+            </li>
+
+            {# alertas #}
+            <li class="nav-item">
+                <button class="btn btn-link icon-header badgeCircle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-bell-o"></span><span class="badge-number bg-danger"></span></button>
+                <div class="dropdown-menu message-container">
+                    <div class="list-unstyled">
+                        <div class="media"> <span class="alert-block bg-primary"><span class="fa fa-bullhorn"></span></span>
+                            <div class="media-body"><b>Max Smith</b> updated post of <b>Astha Smith</b>. Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin.</div>
+                        </div>
+                        <div class="media"> <span class="alert-block bg-warning"><span class="fa fa-bell-o"></span></span>
+                            <div class="media-body"><b>Max Smith</b> updated post of <b>Astha Smith</b>. Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin.</div>
+                        </div>
+                        <div class="media"> <span class="alert-block bg-danger"><span class="fa fa-exclamation-triangle"></span></span>
+                            <div class="media-body"><b>Max Smith</b> updated post of <b>Astha Smith</b>. Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin.</div>
+                        </div>
+                        <div class="media">
+                            <div class="media-body"><b>Max Smith</b> updated post of <b>Astha Smith</b>. Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin.</div>
+                        </div>
+                        <div class="media">
+                            <div class="media-body"><b>Max Smith</b> updated post of <b>Astha Smith</b>. Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin.</div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            {# menu de apps #}
+            <li class="nav-item hidden-xs-down">
+                <button class="btn btn-link icon-header " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-th"></span> </button>
+                <div class="dropdown-menu message-container box-links">
+                    <div class="list-unstyled">
+                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-bullhorn"></span></span> </a>
+                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-bell-o"></span></span></a>
+                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-calendar"></span></span> </a>
+                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-id-card"></span></span> </a>
+                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-handshake-o"></span></span> </a>
+                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-camera-retro"></span></span> </a>
+                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-flask"></span></span> </a>
+                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-plane"></span></span> </a>
+                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-pie-chart"></span></span> </a>
+                    </div>
+                </div>
+            </li>
+            <li class="v-devider"></li>
+
+            {# icone podcast #}
+            <li class="nav-item ">
+                <a class="btn btn-link icon-header menu-collapse-right" href="#"><span class="fa fa-podcast"></span> </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        {% if view.current_user %}
+        {# usuario, foto  e menu dropdown #}
+        <div class="sidebar-right pull-right " >
+            <ul class="navbar-nav  justify-content-end">
+                <li class="nav-item">
+                    <button class="btn-link btn userprofile"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="userpic"><img src="{{ request.static_url('zapizza.site:static/img/user-header.png') }}" alt="user pic"></span> <span class="text"></span>
                         {{ view.current_user.first_name }}
                         {{ view.current_user.last_name }}
-                    </a>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="customerprofile.html">Profile</a>
+                        <a class="dropdown-item" href="#">Analytics Report</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Setting</a>
+                    </div>
                 </li>
                 <li>
-                    <a href="{{ request.route_url('logout') }}" class="btn btn-link text-white">Logout</a>
-                </li>
-                {% else %}
-                <li>
-                    <a href="{{ request.route_url('login') }}" class="btn btn-primary ">Login</a>
+                    <a href="{{ request.route_url('logout') }}" class="btn btn-link icon-header" ><span class="fa fa-sign-out"></span></a>
                 </li>
             </ul>
-            {% endif %}
-
-
         </div>
+        {% else %}
+        {# sem usuário logado exibe login e registro #}
+        <form class="form-inline my-2 my-lg-0  text-right justify-content-end pull-right">
+            <a href="{{ request.route_url('login') }}" class="btn btn-success  my-sm-0">Login</a>
+            <a href="{{ request.route_url('register') }}" class="btn btn-primary ml-2 my-sm-0">Registro</a>
+        </form>
+        {% endif %}
     </nav>
     {% endblock %}
 </header>
 
-<section>
-    {% block content %}
-    {% endblock %}
-</section>
+{# menu lateral esquerdo #}
+<div class="sidebar-left">
+    {# menu do usuario #}
+    <div class="user-menu-items">
+        <div class="list-unstyled btn-group">
+            <button class="media btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="message_userpic"><img class="d-flex" src="{{ request.static_url('zapizza.site:static/img/user-header.png') }}" alt="Generic user image"></span>
+                <span class="media-body"> <span class="mt-0 mb-1">{{ view.current_user.first_name }} {{ view.current_user.last_name }}</span>
+                    <small>Porto Alegre, RS</small> </span>
+            </button>
+            <div class="dropdown-menu"> <a class="dropdown-item" href="customerprofile.html">Profile</a> <a class="dropdown-item" href="inbox.html">Mailbox</a> <a class="dropdown-item" href="#">Application</a> <a class="dropdown-item" href="#">Analytics Report</a> <a class="dropdown-item" href="#">Preferances</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Setting</a> </div>
+        </div>
+    </div>
+    <br>
+    {# menu principal do sistema #}
+    <ul class="nav flex-column in" id="side-menu">
+        <li class="title-nav">MENU</li>
+        {# cadastros #}
+        <li class="nav-item"> <a href="javascript:void(0)" class="menudropdown nav-link">Cadastros<i class="fa fa-angle-down"></i></a>
+            <ul class="nav flex-column nav-second-level in">
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-circle-o"></i>Bordas</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-pie-chart"></i>Tamanhos de Pizza</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-cutlery"></i>Sabores de Pizza</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-map-marker"></i>Bairros</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-map-o"></i>Cidades</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-map-signs"></i>Estados</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-road"></i>Logradouros</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-beer"></i>Bebidas</a></li>
+            </ul>
+        </li>
+        {# clientes #}
+        <li class="nav-item"> <a href="" class="nav-link"><i class="fa fa-user"></i>Clientes</a></li>
+        {# pedidos #}
+        <li class="nav-item"> <a href="" class="nav-link"><i class="fa fa-id-card-o"></i>Pedidos</a></li>
+    </ul>
+    <hr>
+</div>
 
-<footer class="footer-content row  justify-content-between align-items-right">
-    {% block footer %}
-    <div class="col-sm-16 text-right"><a href="#" target="_blank" class="">Política de Privacidade</a> | <a href="#" target="_blank" class="">Termos de uso</a> </div>
-    {% endblock %}
-</footer>
+{# conteudo #}
+{# sempre de wrapper-content e container #}
+<div class="wrapper-content">
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    {# rodape #}
+    {# sempre dentro do wrapper-content e container do conteudo principal #}
+    <footer class="footer-content row justify-content-between align-items-right">
+        {% block footer %}
+        <div class="col-sm-16 text-right"><a href="#" target="_blank" class="">Política de Privacidade</a> | <a href="#" target="_blank" class="">Termos de uso</a> </div>
+        {% endblock %}
+    </footer>
+</div>
+
+{# scripts #}
+{# jQuery first, then Tether, then Bootstrap JS. #}
+<script src="{{ request.static_url('zapizza.site:static/js/jquery-2.1.1.min.js') }}"></script>
+<script src="{{ request.static_url('zapizza.site:static/vendor/bootstrap4alpha/js/tether.min.js') }}') }}"></script>
+<script src="{{ request.static_url('zapizza.site:static/vendor/bootstrap4alpha/js/bootstrap.min.js') }}" type="text/javascript"></script>
+{# Cookie js for theme chooser and applying it #}
+<script src="{{ request.static_url('zapizza.site:static/vendor/cookie/jquery.cookie.js') }}"  type="text/javascript"></script>
+{# IE10 viewport hack for Surface/desktop Windows 8 bug #}
+<script src="{{ request.static_url('zapizza.site:static/js/ie10-viewport-bug-workaround.js') }}"></script>
+{# Circular chart progress js #}
+<script src="{{ request.static_url('zapizza.site:static/vendor/cicular_progress/circle-progress.min.js') }}" type="text/javascript"></script>
+{# sparklines js #}
+<script type="text/javascript" src="{{ request.static_url('zapizza.site:static/vendor/sparklines/jquery.sparkline.min.js') }}"></script>
+{# datatables #}
+<script src="{{ request.static_url('zapizza.site:static/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ request.static_url('zapizza.site:static/vendor/datatables/js/dataTables.bootstrap4.js') }}"></script>
+<script src="{{ request.static_url('zapizza.site:static/vendor/datatables/js/dataTables.responsive.min.js') }}"></script>
+{# custome template js #}
+<script src="{{ request.static_url('zapizza.site:static/js/adminux.js') }}" type="text/javascript"></script>
+<script>"use strict";$(document).on('ready',function(){$('#dataTables-example').DataTable({responsive:true,pageLength:10,sPaginationType:"full_numbers",oLanguage:{oPaginate:{sFirst:"<<",sPrevious:"<",sNext:">",sLast:">>"}}});});</script>
+<script src="{{ request.static_url('zapizza.site:static/js/save.js') }}" ></script>
 
 </body>
 </html>
