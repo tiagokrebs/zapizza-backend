@@ -15,7 +15,6 @@ MarkupSafe==1.0
 PasteDeploy==1.5.2
 peppercorn==0.5
 pipenv==2018.7.1
-pkg-resources==0.0.0
 plaster==1.0
 plaster-pastedeploy==0.4.2
 premailer==3.2.0
