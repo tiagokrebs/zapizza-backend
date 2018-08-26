@@ -300,7 +300,7 @@ class SiteViews:
         """
         if 'confirm.submitted' in self.request.params:
             check = self.request.params.getall("aceito")
-            if check[0] == 'aceito':
+            if check and check[0] == 'aceito':
                 # registra usuário e direciona para home
                 self.current_user.register_confirm = datetime.utcnow()
                 url = self.request.route_url('home')

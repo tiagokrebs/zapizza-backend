@@ -75,3 +75,13 @@ Setup Linux
 
 Dá teus pulo aí...
 
+Deploy em Heroku
+-----------------
+Os arquivos abaixo são exclusivamente utilizados para deploy da aplicação em stack Heroku
+```bash
+Procfile
+run
+runapp
+production_heroku.ini
+```
+Baseado em: https://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/deployment/heroku.html
