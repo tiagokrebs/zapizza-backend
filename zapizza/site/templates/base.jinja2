@@ -23,13 +23,14 @@
         <div class="sidebar-left">  <a class="navbar-brand imglogo" href="{{ request.route_url('home') }}"></a> </div>
         <div class="col"></div>
         <div class="sidebar-right pull-right" >
-            <ul class="navbar-nav  justify-content-end">
-                {% if view.current_user %}
+            <ul class="navbar-nav justify-content-end">
                 <li>
+                    {% if view.current_user %}
                     <a href="" class="btn btn-link text-white">
                         {{ view.current_user.first_name }}
                         {{ view.current_user.last_name }}
-                    </a></li>
+                    </a>
+                </li>
                 <li>
                     <a href="{{ request.route_url('logout') }}" class="btn btn-link text-white">Logout</a>
                 </li>
@@ -37,9 +38,10 @@
                 <li>
                     <a href="{{ request.route_url('login') }}" class="btn btn-primary ">Login</a>
                 </li>
-                {% endif %}
-
             </ul>
+            {% endif %}
+
+
         </div>
     </nav>
     {% endblock %}
