@@ -85,3 +85,11 @@ runapp
 production_heroku.ini
 ```
 Baseado em: https://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/deployment/heroku.html
+
+Comandos úteis
+```bash
+git push heroku master
+snap run heroku open
+snap run heroku logs -t
+snap run heroku pg:psql
+```
