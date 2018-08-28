@@ -15,15 +15,16 @@
 
     {# favicon #}
     <link rel="icon" href="{{ request.static_url('zapizza.site:static/favicon.png') }}">
-    {# vendor #}
+    {# titulo #}
+    <title> Zapizza {% block title %}{% endblock %}</title>
+
+    {# Fontawesome icon CSS #}
     <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/vendor/font-awesome-4.7.0/css/font-awesome.min.css') }}" type="text/css">
+    {# Bootstrap CSS #}
     <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/vendor/bootstrap4alpha/css/bootstrap.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/vendor/datatables/css/dataTables.bootstrap4.css') }}">
-    <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/vendor/datatables/css/responsive.dataTables.min.css') }}">
-    {# css #}
+    {# Adminux CSS #}
     <link rel="stylesheet" href="{{ request.static_url('zapizza.site:static/css/dark_brown_adminux.css') }}">
 
-    <title> Zapizza {% block title %}{% endblock %}</title>
     {% endblock %}
 </head>
 
@@ -145,7 +146,7 @@
                         {{ view.current_user.last_name }}
                     </button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="customerprofile.html">Meu Perfil</a>
+                        <a class="dropdown-item" href="{{ request.route_url('users_edit', username=view.current_user.username) }}">Meu Perfil</a>
                         <a class="dropdown-item" href="#">Configurações</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{{ request.route_url('logout') }}">Sair</a>
@@ -192,7 +193,9 @@
     <ul class="nav flex-column in" id="side-menu">
         <li class="title-nav">MENU</li>
         {# cadastros #}
-        <li class="nav-item"> <a href="javascript:void(0)" class="menudropdown nav-link">Cadastros<i class="fa fa-angle-down"></i></a>
+        <li class="nav-item">
+            <a href="javascript:void(0)" class="menudropdown nav-link">Cadastros
+                <i class="fa fa-angle-down"></i></a>
             <ul class="nav flex-column nav-second-level in">
                 <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-circle-o"></i>Bordas</a></li>
                 <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-pie-chart"></i>Tamanhos de Pizza</a></li>
@@ -232,7 +235,7 @@
 {# scripts #}
 {# jQuery first, then Tether, then Bootstrap JS. #}
 <script src="{{ request.static_url('zapizza.site:static/js/jquery-2.1.1.min.js') }}"></script>
-<script src="{{ request.static_url('zapizza.site:static/vendor/bootstrap4alpha/js/tether.min.js') }}') }}"></script>
+<script src="{{ request.static_url('zapizza.site:static/vendor/bootstrap4alpha/js/tether.min.js') }}"></script>
 <script src="{{ request.static_url('zapizza.site:static/vendor/bootstrap4alpha/js/bootstrap.min.js') }}" type="text/javascript"></script>
 {# Cookie js for theme chooser and applying it #}
 <script src="{{ request.static_url('zapizza.site:static/vendor/cookie/jquery.cookie.js') }}"  type="text/javascript"></script>
@@ -242,14 +245,8 @@
 <script src="{{ request.static_url('zapizza.site:static/vendor/cicular_progress/circle-progress.min.js') }}" type="text/javascript"></script>
 {# sparklines js #}
 <script type="text/javascript" src="{{ request.static_url('zapizza.site:static/vendor/sparklines/jquery.sparkline.min.js') }}"></script>
-{# datatables #}
-<script src="{{ request.static_url('zapizza.site:static/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
-<script src="{{ request.static_url('zapizza.site:static/vendor/datatables/js/dataTables.bootstrap4.js') }}"></script>
-<script src="{{ request.static_url('zapizza.site:static/vendor/datatables/js/dataTables.responsive.min.js') }}"></script>
 {# custome template js #}
 <script src="{{ request.static_url('zapizza.site:static/js/adminux.js') }}" type="text/javascript"></script>
-<script>"use strict";$(document).on('ready',function(){$('#dataTables-example').DataTable({responsive:true,pageLength:10,sPaginationType:"full_numbers",oLanguage:{oPaginate:{sFirst:"<<",sPrevious:"<",sNext:">",sLast:">>"}}});});</script>
-<script src="{{ request.static_url('zapizza.site:static/js/save.js') }}" ></script>
 
 </body>
 </html>

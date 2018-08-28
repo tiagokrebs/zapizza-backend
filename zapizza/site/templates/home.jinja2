@@ -1,15 +1,25 @@
 {# home principal do site #}
 {# IF principal verifica se existe um usuário registrado corrente #}
-{# caso sim mosta bem vindo, caso não exibe opção de registro #}
+{# caso sim mosta bem vindo #}
 
 {% extends "base.jinja2" %}
 {% block title %}Home{% endblock %}
 {% block content %}
 {% if view.current_user %}
-<div class="row  align-items-center justify-content-between">
+<div class="row align-items-center justify-content-between">
     <div class="col-11 col-sm-12 page-title">
         <h3>Bem vindo ao Zapizza caro {{ view.current_user.first_name }}</h3>
         <p>Vamo dale</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-16">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title">Página em branco</h6>
+            </div>
+            <div class="card-body"></div>
+        </div>
     </div>
 </div>
 {% endif %}
