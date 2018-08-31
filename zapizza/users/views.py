@@ -8,13 +8,45 @@ from deform import Form, ValidationFailure
 from pyramid_sqlalchemy import Session
 from ..users.models import User
 
+"""
+Schema para usuário
+required é default, para não required informar drop
+All permite mais de um validador por nodo
+outros atributos em debug do objeto Form podem ser informadas (ex: oid)
+DForm.Field é um tipo de DForm.Form
+Limitação: type=email nao funciona com serialize() precisa ser text
+"""
+
 
 class UserSchema(colander.MappingSchema):
-    email = colander.SchemaNode(colander.String())
-    username = colander.SchemaNode(colander.String())
-    password = colander.SchemaNode(colander.String())
-    first_name = colander.SchemaNode(colander.String())
-    last_name = colander.SchemaNode(colander.String())
+    email = colander.SchemaNode(colander.String(),
+                                name='email', missing=colander.required,
+                                missing_msg='Campo obrigatório',
+                                validator=colander.Email('E-mail inválido'),
+                                title='E-mail', description='E-mail do usuário')
+    # todo: criar validador para duplicacao de username
+    # todo: criar validador regex para username letras e numeros
+    username = colander.SchemaNode(colander.String(),
+                                   name='username', missing=colander.required,
+                                   missing_msg='Campo obrigatório',
+                                   validator=colander.All(
+                                       colander.Length(min=3, max=120,
+                                                       min_err='Informe no mínimo 3 caracteres',
+                                                       max_err='Informe no máximo 120 caracteres')),
+                                   title='Username', description='Username do usuário')
+    # todo: propriedades adicionais nos nodos abaixo
+    first_name = colander.SchemaNode(colander.String(), oid='email',
+                                     name='first_name', missing=colander.required,
+                                     missing_msg='Campo obrigatório',
+                                     validator=colander.All(
+                                         colander.Length(max=120, max_err='Informe um nome menor')),
+                                     title='Primeiro Nome', description='Primeiro nome do usuário')
+    last_name = colander.SchemaNode(colander.String(),
+                                    name='last_name', missing=colander.required,
+                                    missing_msg='Campo obrigatório',
+                                    validator=colander.All(
+                                        colander.Length(max=120, max_err='Informe um nome menor')),
+                                    title='Último Nome', description='Último nome do usuário')
 
 
 @view_defaults(permission='view')
@@ -73,7 +105,13 @@ class UserViews:
     @view_config(route_name='users_edit',
                  renderer='templates/edit.jinja2')
     def edit(self):
-        edit_form = self.add_form.render(dict(
+        # children = self.add_form['email']
+        # title = self.add_form['email'].title
+        # value = self.add_form['email'].cstruct
+        # descr = self.add_form['email'].description
+        edit_form = self.add_form
+        edit_form.set_appstruct(dict(
+            email=self.context.email,
             username=self.context.username,
             password=self.context.password,
             first_name=self.context.first_name,
@@ -89,17 +127,18 @@ class UserViews:
         try:
             appstruct = self.add_form.validate(controls)
         except ValidationFailure as e:
-            # Form is NOT valid
-            return dict(edit_form=e.render())
+            # Formulário não é válido
+            edit_form = self.add_form
+            edit_form.set_appstruct(e.cstruct)
+            error = edit_form['email'].errormsg
+            return dict(edit_form=edit_form)
 
         # Valid form so save the data and flash message
+        self.context.email = appstruct['email']
         self.context.username = appstruct['username']
-        self.context.password = appstruct['password']
         self.context.first_name = appstruct['first_name']
         self.context.last_name = appstruct['last_name']
-        self.request.session.flash('Changed: %s' % self.context.username)
-        url = self.request.route_url('users_view',
-                                     username=self.context.username)
+        url = self.request.route_url('home')
         return HTTPFound(url)
 
     @view_config(route_name='users_delete')
