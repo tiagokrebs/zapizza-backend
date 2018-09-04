@@ -117,6 +117,7 @@ class SiteViews:
             return dict()
         return dict(email=email)
 
+    # todo: utilizar Dform + Schema para validação dos atributos ver user_edit_profile
     @view_config(route_name='register', renderer='templates/register.jinja2',
                  request_method='POST')
     def register_handler(self):
@@ -397,6 +398,7 @@ class SiteViews:
 
         return dict(form_block='Token inválido')
 
+    # todo: utilizar Deform + Schemas para validação dos atributos ver user_edit_profile
     @view_config(route_name='reset',
                  renderer='templates/reset.jinja2',
                  request_method='POST')

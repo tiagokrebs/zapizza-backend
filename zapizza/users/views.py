@@ -18,21 +18,52 @@ Limitação: type=email nao funciona com serialize() precisa ser text
 """
 
 
+def username_validator(username):
+    if User.by_username(username):
+        return 'Este username já está em uso'
+
+
+def validator_none(value):
+    return True
+
+
+def email_validator(email):
+    if User.by_username(email):
+        return 'Este e-mail já está em uso'
+
+
+@colander.deferred
+def deferred_sername_validator(node, kw):
+    current_user = kw.get('current_user')
+    username = kw.get('username')
+    if username is None or username == current_user.username:
+        return colander.Function(validator_none)
+    else:
+        return colander.Function(username_validator)
+
+
+@colander.deferred
+def deferred_email_validator(node, kw):
+    current_user = kw.get('current_user')
+    email = kw.get('email')
+    if email is None or email == current_user.email:
+        return colander.Function(validator_none)
+    else:
+        return colander.Function(email_validator)
+
+
 class UserSchema(colander.MappingSchema):
     email = colander.SchemaNode(colander.String(),
                                 name='email', missing=colander.required,
                                 missing_msg='Campo obrigatório',
-                                validator=colander.Email('E-mail inválido'),
+                                validator=deferred_email_validator,
                                 title='E-mail', description='E-mail do usuário')
     # todo: criar validador para duplicacao de username
     # todo: criar validador regex para username letras e numeros
     username = colander.SchemaNode(colander.String(),
                                    name='username', missing=colander.required,
                                    missing_msg='Campo obrigatório',
-                                   validator=colander.All(
-                                       colander.Length(min=3, max=120,
-                                                       min_err='Informe no mínimo 3 caracteres',
-                                                       max_err='Informe no máximo 120 caracteres')),
+                                   validator=deferred_sername_validator,
                                    title='Username', description='Username do usuário')
     # todo: propriedades adicionais nos nodos abaixo
     first_name = colander.SchemaNode(colander.String(), oid='email',
@@ -54,10 +85,8 @@ class UserViews:
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        self.add_schema = UserSchema()
-        self.add_form = Form(self.add_schema, buttons=('submit',))
-        self.messages = request.session.pop_flash()
         self.current_user = User.by_username(request.authenticated_userid)
+        self.messages = request.session.pop_flash()
 
     @view_config(route_name='users_list',
                  renderer='templates/list.jinja2'
@@ -67,7 +96,7 @@ class UserViews:
 
     @view_config(route_name='users_add', renderer='templates/add.jinja2')
     def add(self):
-        return dict(add_form=self.add_form.render())
+        return dict(add_form=self.profile_form.render())
 
     @view_config(route_name='users_add',
                  renderer='templates/add.jinja2',
@@ -75,7 +104,7 @@ class UserViews:
     def add_handler(self):
         controls = self.request.POST.items()
         try:
-            appstruct = self.add_form.validate(controls)
+            appstruct = self.profile_form.validate(controls)
         except ValidationFailure as e:
             # Form is NOT valid
             return dict(add_form=e.render())
@@ -102,14 +131,14 @@ class UserViews:
     def view(self):
         return dict()
 
-    @view_config(route_name='users_edit',
-                 renderer='templates/edit.jinja2')
-    def edit(self):
-        # children = self.add_form['email']
-        # title = self.add_form['email'].title
-        # value = self.add_form['email'].cstruct
-        # descr = self.add_form['email'].description
-        edit_form = self.add_form
+    @view_config(route_name='users_profile_edit',
+                 renderer='templates/edit_profile.jinja2')
+    def edit_profile(self):
+        user_schema = UserSchema().bind(current_user=self.current_user,
+                                        username=None,
+                                        email=None)
+        profile_form = Form(user_schema)
+        edit_form = profile_form
         edit_form.set_appstruct(dict(
             email=self.context.email,
             username=self.context.username,
@@ -119,21 +148,26 @@ class UserViews:
         ))
         return dict(edit_form=edit_form)
 
-    @view_config(route_name='users_edit',
-                 renderer='templates/edit.jinja2',
+    @view_config(route_name='users_profile_edit',
+                 renderer='templates/edit_profile.jinja2',
                  request_method='POST')
-    def edit_handler(self):
+    def edit_profile_handler(self):
+        username = self.request.params['username']
+        email = self.request.params['email']
+        user_schema = UserSchema().bind(current_user=self.current_user,
+                                        username=username,
+                                        email=email)
         controls = self.request.POST.items()
+        profile_form = Form(user_schema)
         try:
-            appstruct = self.add_form.validate(controls)
+            appstruct = profile_form.validate(controls)
         except ValidationFailure as e:
             # Formulário não é válido
-            edit_form = self.add_form
+            edit_form = profile_form
             edit_form.set_appstruct(e.cstruct)
-            error = edit_form['email'].errormsg
             return dict(edit_form=edit_form)
 
-        # Valid form so save the data and flash message
+        # formulário válido então salve a resposta
         self.context.email = appstruct['email']
         self.context.username = appstruct['username']
         self.context.first_name = appstruct['first_name']

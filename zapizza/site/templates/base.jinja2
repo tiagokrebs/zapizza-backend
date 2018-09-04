@@ -1,7 +1,17 @@
-{# base principal #}
-{# contém a estutura principal do site composta por header, conteúdo e footer #}
-{# diversos IFs exibem o conteúdo de acordo com a existência de um usuário corrente #}
-{# utilizar comentários tipo Jinja2, são ocultados quando o layout é renderizado #}
+{# base principal
+contém a estutura principal do site utilizada em todos os outros templates
+quando um formulário de trabalho necessitar de um css/js personalizado
+utilizar jinja2.super() e adicionar os css/js no template filho
+
+Estrutura:
+block head -> meta e links
+block title -> título da página no navegador
+block header -> barra superior
+block aside -> menu principal esquerdo
+block content -> formulários de trabalho
+block footer -> rodapé
+block scripts -> scripts
+#}
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -146,7 +156,7 @@
                         {{ view.current_user.last_name }}
                     </button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="{{ request.route_url('users_edit', username=view.current_user.username) }}">Meu Perfil</a>
+                        <a class="dropdown-item" href="{{ request.route_url('users_profile_edit', username=view.current_user.username) }}">Meu Perfil</a>
                         <a class="dropdown-item" href="#">Configurações</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{{ request.route_url('logout') }}">Sair</a>
@@ -173,6 +183,7 @@
     {% endblock %}
 </header>
 
+{% block aside %}
 {# menu lateral esquerdo #}
 <div class="sidebar-left">
     {# menu do usuario #}
@@ -214,6 +225,7 @@
     </ul>
     <hr>
 </div>
+{% endblock %}
 
 {# conteudo #}
 {# sempre de wrapper-content e container #}
@@ -233,6 +245,7 @@
 </div>
 
 {# scripts #}
+{% block scripts %}
 {# jQuery first, then Tether, then Bootstrap JS. #}
 <script src="{{ request.static_url('zapizza.site:static/js/jquery-2.1.1.min.js') }}"></script>
 <script src="{{ request.static_url('zapizza.site:static/vendor/bootstrap4alpha/js/tether.min.js') }}"></script>
@@ -247,6 +260,7 @@
 <script type="text/javascript" src="{{ request.static_url('zapizza.site:static/vendor/sparklines/jquery.sparkline.min.js') }}"></script>
 {# custome template js #}
 <script src="{{ request.static_url('zapizza.site:static/js/adminux.js') }}" type="text/javascript"></script>
+{% endblock %}
 
 </body>
 </html>

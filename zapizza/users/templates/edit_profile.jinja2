@@ -15,7 +15,6 @@
                     <h5 class="m-0">Informe seus dados pessoais</h5>
                     <hr>
                     <div>
-
                         {# escrito a mao utilizando funções Deform #}
                         <div class="row justify-content-center">
                             <div class="col-md-10 ">
@@ -30,7 +29,7 @@
                                         <label class="form-control-label">{{ edit_form['username'].title }}</label>
                                         {% if edit_form['username'].required %} <span class="form-control-label">*</span> {% endif %}
                                         {{ edit_form['username'].serialize() | safe }}
-                                        {% if edit_form['username'].error %} <span class="form-control-label">{{ edit_form['username'].errormsg }}</span> {% endif %}
+                                        {% if edit_form['username'].error %} <span class="form-control-label">{{ edit_form['username'].error.messages()[0] }}</span> {% endif %}
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -49,18 +48,10 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
-                    {# renderizado com Deform #}
-                    <!--<div class="row justify-content-center">
-                        <div class="col-md-10 ">
-                            {{ edit_form | safe }}
-                        </div>
-                    </div>-->
-
                     {# formulario adminux exemplo #}
-                    <!--<div class="row justify-content-center">
+                    {#<!--<div class="row justify-content-center">
                         <div class="col-md-10 ">
                             <div class="form-group row">
                                 <div class="col-lg-8 col-md-8">
@@ -445,11 +436,11 @@
                                 </div>
                             </div>
                         </div>
-                    </div>-->
+                    </div>-->#}
 
                 </div>
                 <div class="card-footer">
-                    <button class="btn btn-secondary">Cancelar</button>
+                    <a href="{{ request.route_url('home') }}" class="btn btn-secondary">Cancelar</a>
                     <button type="submit" name="form.submitted" class="btn btn-success pull-right">Gravar</button>
                 </div>
             </form>

@@ -60,7 +60,7 @@ class BordaViews:
         return dict()
 
     @view_config(route_name='bordas_edit',
-                 renderer='templates/edit.jinja2')
+                 renderer='templates/edit_profile.jinja2')
     def edit(self):
         edit_form = self.form.render(dict(
             nome_borda=self.context.nome_borda,
@@ -69,7 +69,7 @@ class BordaViews:
         return dict(edit_form=edit_form)
 
     @view_config(route_name='bordas_edit',
-                 renderer='templates/edit.jinja2',
+                 renderer='templates/edit_profile.jinja2',
                  request_method='POST')
     def edit_handler(self):
         controls = self.request.POST.items()

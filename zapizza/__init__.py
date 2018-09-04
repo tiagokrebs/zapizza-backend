@@ -13,7 +13,7 @@ def main(global_config, **settings):
     config.scan()
     config.include('pyramid_sqlalchemy')
     metadata.create_all()
-    config.add_static_view(name='deform_static', path='deform:static')
+    #config.add_static_view(name='deform_static', path='deform:static')
     config.add_static_view(name='static', path='zapizza.site:static')
 
     # Site routes
@@ -44,7 +44,7 @@ def main(global_config, **settings):
                      factory='.users.models.user_factory')
     config.add_route('users_view', '/users/{username}',
                      factory='.users.models.user_factory')
-    config.add_route('users_edit', '/users/{username}/edit',
+    config.add_route('users_profile_edit', '/users/{username}/profile',
                      factory='.users.models.user_factory')
     config.add_route('users_delete', '/users/{username}/delete',
                      factory='.users.models.user_factory')
