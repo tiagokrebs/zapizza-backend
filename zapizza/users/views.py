@@ -197,7 +197,7 @@ class UserViews:
         if appstruct['username'] != self.context.username:
             self.context.username = appstruct['username']
             headers = remember(self.request, self.context.username)
-            return HTTPFound(location=self.request.current_route_url(),
+            return HTTPFound(location=self.request.current_route_url(username=self.current_user.username),
                              headers=headers)
 
         return HTTPFound(location=self.request.current_route_url())
