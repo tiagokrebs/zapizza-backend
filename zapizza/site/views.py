@@ -18,11 +18,18 @@ class SiteViews:
     def __init__(self, context, request):
         self.context = context
         self.request = request
+        self.primary_messages = request.session.pop_flash('primary')
+        self.success_messages = request.session.pop_flash('success')
+        self.danger_messages = request.session.pop_flash('danger')
+        self.warning_messages = request.session.pop_flash('warning')
         self.current_user = User.by_username(request.authenticated_userid)
 
     @view_config(route_name='home', renderer='templates/home.jinja2')
     def home(self):
-        return dict()
+        return dict(primary_messages=self.primary_messages,
+                    success_messages=self.success_messages,
+                    danger_messages=self.danger_messages,
+                    warning_messages=self.warning_messages)
 
     @view_config(route_name='home', renderer='templates/home.jinja2',
                  request_method='POST')
@@ -87,9 +94,9 @@ class SiteViews:
         username = request.params['username']
         password = request.params['password']
         came_from = request.params['came_from']
-        user = User.by_username(username)
+        user = User.by_username_email(username)
         if user and user.password == password:
-            headers = remember(request, username)
+            headers = remember(request, user.username)
             if came_from:
                 return HTTPFound(location=came_from,
                                  headers=headers)
@@ -111,6 +118,7 @@ class SiteViews:
 
     @view_config(route_name='register', renderer='templates/register.jinja2')
     def register(self):
+        # todo: utilizar Deform + colander para formulário de registro
         try:
             email = self.request.params['new']
         except:
@@ -121,6 +129,7 @@ class SiteViews:
     @view_config(route_name='register', renderer='templates/register.jinja2',
                  request_method='POST')
     def register_handler(self):
+        # todo: utilizar Deform + colander para validação do registro
         request = self.request
         email = request.params['email']
         username = request.params['username']
@@ -169,7 +178,7 @@ class SiteViews:
             )
 
         # verifica regex mínimo para username
-        if not re.match(r"[a-zA-Z0-9]{3,120}", username):
+        if not re.match(r"^[a-zA-Z0-9]{3,120}$", username):
             return dict(
                 form_error='Username inválido',
                 email=email,
@@ -217,7 +226,7 @@ class SiteViews:
             )
 
         # verifica regex mínimo para fname
-        if fname and not re.match(r"[a-zA-Z ]{3,120}", fname):
+        if fname and not re.match(r"^[a-zA-Z]{3,120}$", fname):
             return dict(
                 form_error='Primeiro nome inválido',
                 email=email,
@@ -233,7 +242,7 @@ class SiteViews:
             )
 
         # verifica regex mínimo para lname
-        if lname and not re.match(r"[a-zA-Z ]{3,120}", lname):
+        if lname and not re.match(r"^[a-zA-Z]{3,120}$", lname):
             return dict(
                 form_error='Último nome inválido',
                 email=email,

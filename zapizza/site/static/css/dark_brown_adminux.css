@@ -206,6 +206,7 @@ a {
   width: 6px;
 }
 
+/* essa animação consome 20% de cpu constante no Chrome
 .badge-number:after {
   content: '';
   position: absolute;
@@ -223,7 +224,7 @@ a {
   -moz-animation: sonar 1.5s infinite;
   -ms-animation: sonar 1.5s infinite;
   -webkit-animation: sonar 1.5s infinite;
-}
+}*/
 
 .pull-right .dropdown-menu {
   left: auto;
@@ -260,6 +261,7 @@ a {
   border-radius: 3px;
   overflow: hidden;
   margin-right: 15px;
+  background: #ffffff;
 }
 
 .message_userpic img {

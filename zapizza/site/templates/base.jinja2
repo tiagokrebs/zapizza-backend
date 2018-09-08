@@ -71,7 +71,7 @@ block scripts -> scripts
         <ul class="navbar-nav content-right">
             <li class="v-devider"></li>
             {# mensagens #}
-            <li class="nav-item active">
+            {#<!--<li class="nav-item active">
                 <button class="btn btn-link icon-header "  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-envelope-o"></span> <span class="badge-number bg-success"></span></button>
                 <div class="dropdown-menu message-container">
                     <div class="list-unstyled"> <a href="#" class="media"> <span class="message_userpic"><img class="d-flex" src="{{ request.static_url('zapizza.site:static/img/user-header.png') }}" alt="Generic user image"></span>
@@ -96,7 +96,7 @@ block scripts -> scripts
                             Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. </div>
                     </a> </div>
                 </div>
-            </li>
+            </li>-->#}
 
             {# alertas #}
             <li class="nav-item">
@@ -127,31 +127,26 @@ block scripts -> scripts
                 <button class="btn btn-link icon-header " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-th"></span> </button>
                 <div class="dropdown-menu message-container box-links">
                     <div class="list-unstyled">
-                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-bullhorn"></span></span> </a>
-                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-bell-o"></span></span></a>
-                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-calendar"></span></span> </a>
-                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-id-card"></span></span> </a>
-                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-handshake-o"></span></span> </a>
-                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-camera-retro"></span></span> </a>
-                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-flask"></span></span> </a>
-                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-plane"></span></span> </a>
-                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-pie-chart"></span></span> </a>
+                        <a href="{{ request.route_url('home') }}" class="media"> <span class="quick-block "><span class="fa fa-home"></span></span></a>
+                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-shopping-cart"></span></span></a>
+                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-question"></span></span></a>
                     </div>
                 </div>
             </li>
             <li class="v-devider"></li>
 
             {# icone podcast #}
-            <li class="nav-item ">
+            {#<!--<li class="nav-item ">
                 <a class="btn btn-link icon-header menu-collapse-right" href="#"><span class="fa fa-podcast"></span> </a>
-            </li>
+            </li>-->}#
         </ul>
 
         {# usuario, foto  e menu dropdown #}
         <div class="sidebar-right pull-right " >
             <ul class="navbar-nav  justify-content-end">
                 <li class="nav-item">
-                    <button class="btn-link btn userprofile"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="userpic"><img src="{{ request.static_url('zapizza.site:static/img/user-header.png') }}" alt="user pic"></span> <span class="text"></span>
+                    <button class="btn-link btn userprofile"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="userpic"><img src="{{ request.static_url('zapizza.site:static/img/user-header.png') }}" alt="user pic"></span> <span class="text"></span>
                         {{ view.current_user.first_name }}
                         {{ view.current_user.last_name }}
                     </button>
@@ -189,39 +184,46 @@ block scripts -> scripts
     {# menu do usuario #}
     <div class="user-menu-items">
         <div class="list-unstyled btn-group">
-            <button class="media btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="message_userpic"><img class="d-flex" src="{{ request.static_url('zapizza.site:static/img/user-header.png') }}" alt="Generic user image"></span>
+            <button class="media btn btn-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="message_userpic"><img class="d-flex" src="{{ request.static_url('zapizza.site:static/img/user-header.png') }}" alt="Generic user image"></span>
                 <span class="media-body"> <span class="mt-0 mb-1">{{ view.current_user.first_name }} {{ view.current_user.last_name }}</span>
                     <small>Porto Alegre, RS</small> </span>
             </button>
             <div class="dropdown-menu">
-                <a class="dropdown-item" href="customerprofile.html">Meu Perfil</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Configurações</a> </div>
+                <a class="dropdown-item" href="{{ request.route_url('users_profile_edit', username=view.current_user.username) }}">Meu Perfil</a>
+                <a class="dropdown-item" href="">Configurações</a>
+            </div>
         </div>
     </div>
     <br>
     {# menu principal do sistema #}
     <ul class="nav flex-column in" id="side-menu">
         <li class="title-nav">MENU</li>
-        {# cadastros #}
+        {# produtos #}
         <li class="nav-item">
-            <a href="javascript:void(0)" class="menudropdown nav-link">Cadastros
-                <i class="fa fa-angle-down"></i></a>
-            <ul class="nav flex-column nav-second-level in">
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-circle-o"></i>Bordas</a></li>
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-pie-chart"></i>Tamanhos de Pizza</a></li>
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-cutlery"></i>Sabores de Pizza</a></li>
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-map-marker"></i>Bairros</a></li>
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-map-o"></i>Cidades</a></li>
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-map-signs"></i>Estados</a></li>
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-road"></i>Logradouros</a></li>
+            <a href="javascript:void(0)" class="menudropdown nav-link">Produtos<i class="fa fa-angle-down"></i></a>
+            <ul class="nav flex-column nav-second-level">
                 <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-beer"></i>Bebidas</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-circle-o"></i>Bordas</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-cutlery"></i>Sabores</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-pie-chart"></i>Tamanhos</a></li>
+
             </ul>
         </li>
         {# clientes #}
-        <li class="nav-item"> <a href="" class="nav-link"><i class="fa fa-user"></i>Clientes</a></li>
+        <li class="nav-item">
+            <a href="javascript:void(0)" class="menudropdown nav-link">Clientes<i class="fa fa-angle-down"></i></a>
+            <ul class="nav flex-column nav-second-level">
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-map-marker"></i>Bairros</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-map-o"></i>Cidades</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-users"></i>Clientes</a></li>
+                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-road"></i>Logradouros</a></li>
+            </ul>
+        </li>
         {# pedidos #}
-        <li class="nav-item"> <a href="" class="nav-link"><i class="fa fa-id-card-o"></i>Pedidos</a></li>
+        <li class="nav-item">
+            <a href="" class="nav-link"><i class="fa fa-id-card-o"></i>Pedidos</a>
+        </li>
     </ul>
     <hr>
 </div>
@@ -258,8 +260,24 @@ block scripts -> scripts
 <script src="{{ request.static_url('zapizza.site:static/vendor/cicular_progress/circle-progress.min.js') }}" type="text/javascript"></script>
 {# sparklines js #}
 <script type="text/javascript" src="{{ request.static_url('zapizza.site:static/vendor/sparklines/jquery.sparkline.min.js') }}"></script>
+{# bootstrap notify js #}
+<script type="text/javascript" src="{{ request.static_url('zapizza.site:static/vendor/bootstrap-notify/bootstrap-notify.min.js') }}"></script>
+<script type="text/javascript" src="{{ request.static_url('zapizza.site:static/js/notification.js') }}"></script>
 {# custome template js #}
 <script src="{{ request.static_url('zapizza.site:static/js/adminux.js') }}" type="text/javascript"></script>
+{# alertas toast #}
+{% for msg in primary_messages %}
+<script>alert_primary('{{ primary_messages[loop.index0] }}');</script>
+{% endfor %}
+{% for msg in success_messages %}
+<script>alert_success('{{ success_messages[loop.index0] }}');</script>
+{% endfor %}
+{% for msg in danger_messages %}
+<script>alert_danger('{{ danger_messages[loop.index0] }}');</script>
+{% endfor %}
+{% for msg in warning_messages %}
+<script>alert_warning('{{ warning_messages[loop.index0] }}');</script>
+{% endfor %}
 {% endblock %}
 
 </body>

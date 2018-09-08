@@ -23,7 +23,7 @@
                                         <label class="form-control-label">{{ edit_form['email'].title }}</label>
                                         {% if edit_form['email'].required %} <span class="form-control-label">*</span> {% endif %}
                                         {{ edit_form['email'].serialize() | safe }}
-                                        {% if edit_form['email'].error %} <span class="form-control-label">{{ edit_form['email'].errormsg }}</span> {% endif %}
+                                        {% if edit_form['email'].error %} <span class="form-control-label">{{ edit_form['email'].error.messages()[0] }}</span> {% endif %}
                                     </div>
                                     <div class="col-lg-8 col-md-8 {% if edit_form['username'].error %} has-danger {% endif %}">
                                         <label class="form-control-label">{{ edit_form['username'].title }}</label>
@@ -37,13 +37,13 @@
                                         <label class="form-control-label">{{ edit_form['first_name'].title }}</label>
                                         {% if edit_form['first_name'].required %} <span class="form-control-label">*</span> {% endif %}
                                         {{ edit_form['first_name'].serialize() | safe }}
-                                        {% if edit_form['first_name'].error %} <span class="form-control-label">{{ edit_form['first_name'].errormsg }}</span> {% endif %}
+                                        {% if edit_form['first_name'].error %} <span class="form-control-label">{{ edit_form['first_name'].error.messages()[0] }}</span> {% endif %}
                                     </div>
                                     <div class="col-lg-8 col-md-8 {% if edit_form['last_name'].error %} has-danger {% endif %}">
                                         <label class="form-control-label">{{ edit_form['last_name'].title }}</label>
                                         {% if edit_form['last_name'].required %} <span class="form-control-label">*</span> {% endif %}
                                         {{ edit_form['last_name'].serialize() | safe }}
-                                        {% if edit_form['last_name'].error %} <span class="form-control-label">{{ edit_form['last_name'].errormsg }}</span> {% endif %}
+                                        {% if edit_form['last_name'].error %} <span class="form-control-label">{{ edit_form['last_name'].error.messages()[0] }}</span> {% endif %}
                                     </div>
                                 </div>
                             </div>

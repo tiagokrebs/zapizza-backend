@@ -45,6 +45,16 @@ class User(BaseObject):
     # método busca usuario por username
     @classmethod
     def by_username(cls, username):
+        return Session.query(cls).filter(or_(cls.username == username)).first()
+
+    # método busca usuario por email
+    @classmethod
+    def by_email(cls, email):
+        return Session.query(cls).filter(or_(cls.email == email)).first()
+
+    # método busca usuario por username ou email (login)
+    @classmethod
+    def by_username_email(cls, username):
         return Session.query(cls).filter(or_(cls.username == username, cls.email == username)).first()
 
     # método retorna lista de usuários ordenada nome

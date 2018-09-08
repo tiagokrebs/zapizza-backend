@@ -7,6 +7,7 @@ import colander
 from deform import Form, ValidationFailure
 from pyramid_sqlalchemy import Session
 from ..users.models import User
+from pyramid.security import remember
 
 """
 Schema para usuário
@@ -21,25 +22,32 @@ Limitação: type=email nao funciona com serialize() precisa ser text
 def username_validator(username):
     if User.by_username(username):
         return 'Este username já está em uso'
-
-
-def validator_none(value):
-    return True
+    else:
+        return True
 
 
 def email_validator(email):
-    if User.by_username(email):
+    if User.by_email(email):
         return 'Este e-mail já está em uso'
+    else:
+        True
 
 
 @colander.deferred
-def deferred_sername_validator(node, kw):
+def deferred_username_validator(node, kw):
     current_user = kw.get('current_user')
     username = kw.get('username')
     if username is None or username == current_user.username:
-        return colander.Function(validator_none)
+        return colander.All(colander.Regex(regex=r"^[a-zA-Z0-9]+$", msg='Informe apenas letras e números'),
+                            colander.Length(min=3, max=120,
+                                            min_err='informe no mínimo 3 caracteres',
+                                            max_err='Informa no máximo 120 caracteres'))
     else:
-        return colander.Function(username_validator)
+        return colander.All(colander.Regex(regex=r"^[a-zA-Z0-9]+$", msg='Informe apenas letras e números'),
+                            colander.Length(min=3, max=120,
+                                            min_err='informe no mínimo 3 caracteres',
+                                            max_err='Informa no máximo 120 caracteres'),
+                            colander.Function(username_validator))
 
 
 @colander.deferred
@@ -47,9 +55,10 @@ def deferred_email_validator(node, kw):
     current_user = kw.get('current_user')
     email = kw.get('email')
     if email is None or email == current_user.email:
-        return colander.Function(validator_none)
+        return colander.Email(msg='E-mail inválido')
     else:
-        return colander.Function(email_validator)
+        return colander.All(colander.Email(msg='Email inválido'),
+                            colander.Function(email_validator))
 
 
 class UserSchema(colander.MappingSchema):
@@ -58,25 +67,28 @@ class UserSchema(colander.MappingSchema):
                                 missing_msg='Campo obrigatório',
                                 validator=deferred_email_validator,
                                 title='E-mail', description='E-mail do usuário')
-    # todo: criar validador para duplicacao de username
-    # todo: criar validador regex para username letras e numeros
     username = colander.SchemaNode(colander.String(),
                                    name='username', missing=colander.required,
                                    missing_msg='Campo obrigatório',
-                                   validator=deferred_sername_validator,
+                                   validator=deferred_username_validator,
                                    title='Username', description='Username do usuário')
-    # todo: propriedades adicionais nos nodos abaixo
-    first_name = colander.SchemaNode(colander.String(), oid='email',
+    first_name = colander.SchemaNode(colander.String(),
                                      name='first_name', missing=colander.required,
                                      missing_msg='Campo obrigatório',
-                                     validator=colander.All(
-                                         colander.Length(max=120, max_err='Informe um nome menor')),
+                                     validator=colander.All(colander.Regex(regex=r"^[a-zA-Z]+$",
+                                                                           msg='Informe apenas o primeiro nome'),
+                                                            colander.Length(min=3, max=120,
+                                                                            min_err='informe no mínimo 3 caracteres',
+                                                                            max_err='Informa no máximo 120 caracteres')),
                                      title='Primeiro Nome', description='Primeiro nome do usuário')
     last_name = colander.SchemaNode(colander.String(),
                                     name='last_name', missing=colander.required,
                                     missing_msg='Campo obrigatório',
-                                    validator=colander.All(
-                                        colander.Length(max=120, max_err='Informe um nome menor')),
+                                    validator=colander.All(colander.Regex(regex=r"^[a-zA-Z]+$",
+                                                                          msg='Informe apenas o último nome'),
+                                                           colander.Length(min=3, max=120,
+                                                                           min_err='informe no mínimo 3 caracteres',
+                                                                           max_err='Informa no máximo 120 caracteres')),
                                     title='Último Nome', description='Último nome do usuário')
 
 
@@ -85,8 +97,11 @@ class UserViews:
     def __init__(self, context, request):
         self.context = context
         self.request = request
+        self.primary_messages = request.session.pop_flash('primary')
+        self.success_messages = request.session.pop_flash('success')
+        self.danger_messages = request.session.pop_flash('danger')
+        self.warning_messages = request.session.pop_flash('warning')
         self.current_user = User.by_username(request.authenticated_userid)
-        self.messages = request.session.pop_flash()
 
     @view_config(route_name='users_list',
                  renderer='templates/list.jinja2'
@@ -146,7 +161,11 @@ class UserViews:
             first_name=self.context.first_name,
             last_name=self.context.last_name
         ))
-        return dict(edit_form=edit_form)
+        return dict(primary_messages=self.primary_messages,
+                    success_messages=self.success_messages,
+                    danger_messages=self.danger_messages,
+                    warning_messages=self.warning_messages,
+                    edit_form=edit_form)
 
     @view_config(route_name='users_profile_edit',
                  renderer='templates/edit_profile.jinja2',
@@ -167,13 +186,22 @@ class UserViews:
             edit_form.set_appstruct(e.cstruct)
             return dict(edit_form=edit_form)
 
-        # formulário válido então salve a resposta
+        # formulario valido
+        # armazena restante dos dados
         self.context.email = appstruct['email']
-        self.context.username = appstruct['username']
         self.context.first_name = appstruct['first_name']
         self.context.last_name = appstruct['last_name']
-        url = self.request.route_url('home')
-        return HTTPFound(url)
+        self.request.session.flash('Seu perfil foi atualizado', 'primary')
+
+        # lembra do novo usuario
+        if appstruct['username'] != self.context.username:
+            self.context.username = appstruct['username']
+            headers = remember(self.request, self.context.username)
+            return HTTPFound(location=self.request.current_route_url(),
+                             headers=headers)
+
+        return HTTPFound(location=self.request.current_route_url())
+
 
     @view_config(route_name='users_delete')
     def delete(self):
