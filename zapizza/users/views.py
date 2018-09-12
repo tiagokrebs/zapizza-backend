@@ -91,8 +91,9 @@ class UserSchema(colander.MappingSchema):
                                                                            max_err='Informa no máximo 120 caracteres')),
                                     title='Último Nome', description='Último nome do usuário')
 
-
-@view_defaults(permission='view')
+# todo: rever permissoes para interação de editores com users
+# todo: 'super' deve ser apenas para register e confirm
+@view_defaults(permission='super')
 class UserViews:
     def __init__(self, context, request):
         self.context = context
@@ -141,7 +142,6 @@ class UserViews:
         return HTTPFound(url)
 
     @view_config(route_name='users_view',
-                 permission='view',
                  renderer='templates/view.jinja2')
     def view(self):
         return dict()

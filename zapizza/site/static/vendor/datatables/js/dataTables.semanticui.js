@@ -46,25 +46,34 @@ var DataTable = $.fn.dataTable;
 /* Set the defaults for DataTables initialisation */
 $.extend( true, DataTable.defaults, {
 	dom:
-		"<'row'<'col-md-8'l><'col-md-8 text-right'f>>" +
-		"<'row'<'col-md-16'tr>>" +
-		"<'row'<'col-md-7'i><'col-md-9'p>>",
-	renderer: 'bootstrap'
+		"<'ui grid'"+
+			"<'row'"+
+				"<'eight wide column'l>"+
+				"<'right aligned eight wide column'f>"+
+			">"+
+			"<'row dt-table'"+
+				"<'sixteen wide column'tr>"+
+			">"+
+			"<'row'"+
+				"<'seven wide column'i>"+
+				"<'right aligned nine wide column'p>"+
+			">"+
+		">",
+	renderer: 'semanticUI'
 } );
 
 
 /* Default class modification */
 $.extend( DataTable.ext.classes, {
-	sWrapper:      "dataTables_wrapper  dt-bootstrap4",
-	sFilterInput:  "form-control input-sm",
-	sLengthSelect: "form-control input-sm",
-	sProcessing:   "dataTables_processing panel panel-default",
-	sPageButton:   "paginate_button page-item"
+	sWrapper:      "dataTables_wrapper dt-semanticUI",
+	sFilter:       "dataTables_filter ui input",
+	sProcessing:   "dataTables_processing ui segment",
+	sPageButton:   "paginate_button item"
 } );
 
 
 /* Bootstrap paging button renderer */
-DataTable.ext.renderer.pageButton.bootstrap = function ( settings, host, idx, buttons, page, pages ) {
+DataTable.ext.renderer.pageButton.semanticUI = function ( settings, host, idx, buttons, page, pages ) {
 	var api     = new DataTable.Api( settings );
 	var classes = settings.oClasses;
 	var lang    = settings.oLanguage.oPaginate;
@@ -127,23 +136,23 @@ DataTable.ext.renderer.pageButton.bootstrap = function ( settings, host, idx, bu
 						break;
 				}
 
+				var tag = btnClass.indexOf( 'disabled' ) === -1 ?
+					'a' :
+					'div';
+
 				if ( btnDisplay ) {
-					node = $('<li>', {
+					node = $('<'+tag+'>', {
 							'class': classes.sPageButton+' '+btnClass,
 							'id': idx === 0 && typeof button === 'string' ?
 								settings.sTableId +'_'+ button :
-								null
+								null,
+							'href': '#',
+							'aria-controls': settings.sTableId,
+							'aria-label': aria[ button ],
+							'data-dt-idx': counter,
+							'tabindex': settings.iTabIndex
 						} )
-						.append( $('<a>', {
-								'href': '#',
-								'aria-controls': settings.sTableId,
-								'aria-label': aria[ button ],
-								'data-dt-idx': counter,
-								'tabindex': settings.iTabIndex,
-								'class': 'page-link'
-							} )
-							.html( btnDisplay )
-						)
+						.html( btnDisplay )
 						.appendTo( container );
 
 					settings.oApi._fnBindAction(
@@ -170,7 +179,7 @@ DataTable.ext.renderer.pageButton.bootstrap = function ( settings, host, idx, bu
 	catch (e) {}
 
 	attach(
-		$(host).empty().html('<ul class="pagination pull-right"/>').children('ul'),
+		$(host).empty().html('<div class="ui pagination menu"/>').children(),
 		buttons
 	);
 
@@ -178,6 +187,21 @@ DataTable.ext.renderer.pageButton.bootstrap = function ( settings, host, idx, bu
 		$(host).find( '[data-dt-idx='+activeEl+']' ).focus();
 	}
 };
+
+
+// Javascript enhancements on table initialisation
+$(document).on( 'init.dt', function (e, ctx) {
+	if ( e.namespace !== 'dt' ) {
+		return;
+	}
+
+	// Length menu drop down
+	if ( $.fn.dropdown ) {
+		var api = new $.fn.dataTable.Api( ctx );
+
+		$( 'div.dataTables_length select', api.table().container() ).dropdown();
+	}
+} );
 
 
 return DataTable;

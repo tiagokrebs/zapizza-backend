@@ -8,10 +8,10 @@ from pyramid_sqlalchemy import Session
 from pyramid_sqlalchemy.meta import metadata
 from pyramid.paster import get_appsettings, setup_logging
 
-from ..todos.models import ToDo, sample_todos
+from ..site.hashid import generate_hash
+from ..empresas.models import Empresa, sample_empresas
 from ..users.models import User, sample_users
-from ..pizzas.models import Borda, sample_bordas
-from ..pizzas.models import Bebida, sample_bebidas
+from ..tamanhos.models import Tamanho, sample_tamanhos
 
 
 def usage(argv):
@@ -22,7 +22,7 @@ def usage(argv):
 
 
 def main(argv=sys.argv):
-    # Usage and configuration
+    # Usagem e configuração
     if len(argv) != 2:
         usage(argv)
     config_uri = argv[1]
@@ -31,9 +31,22 @@ def main(argv=sys.argv):
     config = Configurator(settings=settings)
     config.include('pyramid_sqlalchemy')
 
-    # Make the database with schema and default data
+    # Cria o banco de dados com o schema e dados de exemplo
     with transaction.manager:
         metadata.create_all()
+
+        # adiciona empresas
+        for empresa in sample_empresas:
+            e = Empresa(id=empresa['id'],
+                        razao_social=empresa['razao_social'])
+            lista_chaves = [empresa['id']]
+            e.hash_id = generate_hash('empresas', lista_chaves)
+            Session.add(e)
+
+        # obtem empresa pai para adicionar os filhos
+        empresa = Empresa.by_razao(sample_empresas[0]['razao_social'])
+
+        # adiciona users
         for user in sample_users:
             u = User(
                 id=user['id'],
@@ -46,26 +59,22 @@ def main(argv=sys.argv):
                 register_date=datetime.datetime.now(),
                 register_confirm=datetime.datetime.now()
             )
+            lista_chaves = [empresa.id, user['id']]
+            u.hash_id = generate_hash('users', lista_chaves)
+            u.empresa = empresa
             Session.add(u)
 
-        # Get a user to be the owner of content
-        owner = User.by_username(sample_users[0]['username'])
-
-        # Now add todos
-        for todo in sample_todos:
-            t = ToDo(title=todo['title'],
-                     acl=todo.get('acl'))
-            t.owner = owner
+        # adiciona tamanhos
+        for tamanho in sample_tamanhos:
+            t = Tamanho(
+                id=tamanho['id'],
+                descricao=tamanho['descricao'],
+                sigla=tamanho['sigla'],
+                quant_sabores=tamanho['quant_sabores'],
+                quant_bordas=tamanho['quant_bordas'],
+                quant_fatias=tamanho['quant_fatias']
+            )
+            lista_chaves = [empresa.id, tamanho['id']]
+            t.hash_id = generate_hash('tamanhos', lista_chaves)
+            t.empresa = empresa
             Session.add(t)
-
-        # Now add bordas
-        for borda in sample_bordas:
-            b = Borda(nome_borda=borda['nome_borda'],
-                      valor_borda=borda['valor_borda'])
-            Session.add(b)
-
-        # Now add bebidas
-        for bebida in sample_bebidas:
-            b = Bebida(nome_bebida=bebida['nome_bebida'],
-                      valor_bebida=bebida['valor_bebida'])
-            Session.add(b)

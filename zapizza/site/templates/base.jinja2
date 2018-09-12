@@ -129,7 +129,7 @@ block scripts -> scripts
                     <div class="list-unstyled">
                         <a href="{{ request.route_url('home') }}" class="media"> <span class="quick-block "><span class="fa fa-home"></span></span></a>
                         <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-shopping-cart"></span></span></a>
-                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-question"></span></span></a>
+                        <a href="?#" class="media"> <span class="quick-block "><span class="fa fa-tachometer"></span></span></a>
                     </div>
                 </div>
             </li>
@@ -206,7 +206,7 @@ block scripts -> scripts
                 <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-beer"></i>Bebidas</a></li>
                 <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-circle-o"></i>Bordas</a></li>
                 <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-cutlery"></i>Sabores</a></li>
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-pie-chart"></i>Tamanhos</a></li>
+                <li class="nav-item "> <a href="{{ request.route_url('tamanhos_list') }}" class="nav-link"><i class="fa fa-pie-chart"></i>Tamanhos</a></li>
 
             </ul>
         </li>

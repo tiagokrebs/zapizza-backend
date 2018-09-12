@@ -1,11 +1,12 @@
 from pyramid.httpexceptions import HTTPNotFound
-from pyramid.security import Allow, Everyone
+from pyramid.security import Allow, Deny, ALL_PERMISSIONS
 from sqlalchemy import (
     Column,
     String,
     Integer,
     or_,
-    DateTime
+    DateTime,
+    ForeignKey
 )
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.sql.functions import now
@@ -19,6 +20,8 @@ from ..columns import ArrayType
 class User(BaseObject):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
+    empresa_id = Column(Integer, ForeignKey('empresas.id'), nullable=False)
+    hash_id = Column(String(50), index=True, unique=True)
     email = Column(String(150), unique=True, nullable=False)
     username = Column(String(120), unique=True, nullable=False)
     password = Column(String(120), nullable=False)
@@ -27,14 +30,14 @@ class User(BaseObject):
     register_date = Column(DateTime, nullable=False, default=now())
     register_confirm = Column(DateTime)
     groups = Column(ArrayType)
-    # todos = relationship('ToDo', backref='todos',
-    #                     cascade='all, delete, delete-orphan')
 
-    # permissões para admins. todo: users(para crud geral)
+    empresa = relationship('Empresa', back_populates='users')
+
+    # permissões
     __acl__ = [
         (Allow, 'group:admins', 'super'),
-        (Allow, 'group:users', 'edit'),
-        (Allow, Everyone, 'view')  # todo: tirar permissao view para todos
+        (Allow, 'group:editors', 'edit'),
+        (Allow, 'group:users', 'view'),
     ]
 
     # propriedade com nome e sobrenome do usuário
@@ -100,7 +103,7 @@ sample_users = [
         password='user1',
         first_name='Bocó',
         last_name='de Mola',
-        groups=[]
+        groups=['group:editors']
     ),
     dict(
         id=3,
@@ -109,6 +112,6 @@ sample_users = [
         password='admin',
         first_name='Yoda',
         last_name='Mestre',
-        groups=['group:admins', 'group:users']
+        groups=['group:admins']
     )
 ]

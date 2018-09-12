@@ -5,6 +5,7 @@ colander==1.4
 cssselect==1.0.3
 cssutils==1.0.2
 deform==2.0.5
+hashids==1.2.0
 hupper==1.0
 idna==2.6
 iso8601==0.1.11

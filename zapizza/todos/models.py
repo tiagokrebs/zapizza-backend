@@ -17,13 +17,17 @@ class ToDo(BaseObject):
     id = Column(Integer, primary_key=True)
     title = Column(Text)
     acl = Column(ArrayType)
+
+    # acl a nivel de objeto
+    # permissoes diferentes para registros diferentes no bd
     default_acl = [
         (Allow, Everyone, 'view'),
         (Allow, 'group:editors', 'edit')
     ]
+
     owner_id = Column(Integer, ForeignKey('users.id'))
     owner = relationship('User')
-
+    # acl a nivel de objeto
     def __acl__(self=None):
         return getattr(self, 'acl', None) or ToDo.default_acl
 

@@ -13,7 +13,6 @@ def main(global_config, **settings):
     config.scan()
     config.include('pyramid_sqlalchemy')
     metadata.create_all()
-    #config.add_static_view(name='deform_static', path='deform:static')
     config.add_static_view(name='static', path='zapizza.site:static')
 
     # Site routes
@@ -24,6 +23,30 @@ def main(global_config, **settings):
     config.add_route('confirm', '/confirm/{token}', factory='.users.models.user_factory')
     config.add_route('forgot', '/forgot')
     config.add_route('reset', '/reset/{token}', factory='.users.models.user_factory')
+
+    # Rotas Users com route factory
+    config.add_route('users_list', '/users',
+                     factory='.users.models.user_factory')
+    config.add_route('users_add', '/users/add',
+                     factory='.users.models.user_factory')
+    config.add_route('users_view', '/users/{username}',
+                     factory='.users.models.user_factory')
+    config.add_route('users_profile_edit', '/users/{username}/profile',
+                     factory='.users.models.user_factory')
+    config.add_route('users_delete', '/users/{username}/delete',
+                     factory='.users.models.user_factory')
+
+    # Rotas Tamanhos com route factory
+    config.add_route('tamanhos_list', '/tamanhos',
+                     factory='.tamanhos.models.tamanho_factory')
+    config.add_route('tamanhos_add', '/tamanhos/add',
+                     factory='.tamanhos.models.tamanho_factory')
+    config.add_route('tamanhos_view', '/tamanhos/{hashid}',
+                     factory='.tamanhos.models.tamanho_factory')
+    config.add_route('tamanhos_profile_edit', '/tamanhos/{hashid}/profile',
+                     factory='.tamanhos.models.tamanho_factory')
+    config.add_route('tamanhos_delete', '/tamanhos/{hashid}/delete',
+                     factory='.tamanhos.models.tamanho_factory')
 
     # To Do routes with route factory
     config.add_route('todos_list', '/todos',
@@ -36,30 +59,6 @@ def main(global_config, **settings):
                      factory='.todos.models.todo_factory')
     config.add_route('todos_delete', '/todos/{id}/delete',
                      factory='.todos.models.todo_factory')
-
-    # User routes with route factory
-    config.add_route('users_list', '/users',
-                     factory='.users.models.user_factory')
-    config.add_route('users_add', '/users/add',
-                     factory='.users.models.user_factory')
-    config.add_route('users_view', '/users/{username}',
-                     factory='.users.models.user_factory')
-    config.add_route('users_profile_edit', '/users/{username}/profile',
-                     factory='.users.models.user_factory')
-    config.add_route('users_delete', '/users/{username}/delete',
-                     factory='.users.models.user_factory')
-
-    # Borda routes with route factory
-    config.add_route('bordas_list', '/users',
-                     factory='.pizzas.models.borda_factory')
-    config.add_route('bordas_add', '/users/add',
-                     factory='.pizzas.models.borda_factory')
-    config.add_route('bordas_view', '/borda/{id}',
-                     factory='.pizzas.models.borda_factory')
-    config.add_route('bordas_edit', '/borda/{id}/edit',
-                     factory='.pizzas.models.borda_factory')
-    config.add_route('bordas_delete', '/borda/{id}/delete',
-                     factory='.pizzas.models.borda_factory')
 
     # Factory da sessão
     session_secret = settings['session.secret']

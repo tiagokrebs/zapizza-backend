@@ -7,9 +7,11 @@ from pyramid.view import (
 )
 import re
 from ..users.models import User
+from ..empresas.models import Empresa
 from ..site.token import confirm_token
 from ..site.email import send_async_templated_mail
 from ..site.token import generate_token
+from ..site.hashid import generate_hash
 from datetime import datetime, timedelta
 from pyramid_sqlalchemy import Session
 
@@ -38,7 +40,7 @@ class SiteViews:
         email = request.params['email']
         if email:
             # verifica se o email informado já existe
-            if User.by_username(email):
+            if User.by_email(email):
                 return dict(
                     form_error='O e-mail informado já está cadastrado',
                     email=email,
@@ -146,7 +148,7 @@ class SiteViews:
                 )
 
         # verifica uso de email por usuário existente
-        if User.by_username(email):
+        if User.by_email(email):
             return dict(
                 form_error='O e-mail informado já está cadastrado',
                 email=email,
@@ -249,13 +251,26 @@ class SiteViews:
                 username=username, fname=fname, lname=lname
             )
 
-        groups = ['group:admins', 'group:editors']
-        Session.add(User(
+        # insere empresa pai do usuário em registro e atualiza hash_id
+        e = Empresa()
+        Session.add(e)
+        Session.flush()
+        Session.refresh(e)
+        e.hash_id = generate_hash('empresas', [e.id])
+
+        # insere usuario em registro e atualiza hash_id
+        groups = ['group:admins']
+        u = User(
             email=email, username=username,
             password=password, first_name=fname,
-            last_name=lname, groups=groups
-        ))
-        user = User.by_username(username)
+            last_name=lname, groups=groups,
+            empresa_id=e.id
+        )
+        Session.add(u)
+        Session.flush()
+        Session.refresh(u)
+        u.hash_id = generate_hash('users', [e.id, u.id])
+        # user = User.by_username(username)
 
         # token expira em 24h, tipo registro, confirmado com email
         token_data = {'exp': datetime.utcnow() + timedelta(days=1), 'aud': 'registro', 'email': email}
@@ -270,9 +285,10 @@ class SiteViews:
                                       link=confirm_url
                                   ))
 
-        if user:
-            form_error = 'Verifique seu email para realizar a confirmação'
-            return dict(form_error=form_error, user=user)
+        # if user:
+        form_error = 'Verifique seu email para realizar a confirmação'
+        # return dict(form_error=form_error, user=user)
+        return dict(form_error=form_error)
 
     @view_config(route_name='confirm',
                  permission='super',
@@ -289,7 +305,7 @@ class SiteViews:
         if token_data:
             aud = token_data['aud']
             email = token_data['email']
-            user = User.by_username(email)
+            user = User.by_email(email)
             if self.current_user and aud == 'registro' and self.current_user.email == user.email:
                 # usuário já registrado direcionado para home
                 if self.current_user.register_confirm:
@@ -327,7 +343,7 @@ class SiteViews:
         """
         if 'resend.submitted' in self.request.params:
             email = self.request.params['email']
-            user = User.by_username(email)
+            user = User.by_email(email)
 
             if self.current_user and user and self.current_user.email == user.email:
                 # token expira em 24h, tipo registro, confirmado com email
@@ -361,14 +377,14 @@ class SiteViews:
             )
         else:
             # verifica se o email informado existe
-            if not User.by_username(email):
+            if not User.by_email(email):
                 return dict(
                     form_error='E-mail informado não encontrado',
                     email=email,
                 )
             # envia email de confirmação de senha com token
             else:
-                user = User.by_username(email)
+                user = User.by_email(email)
 
                 # token expira em 1h, tipo registro, confirmado com email
                 token_data = {'exp': datetime.utcnow() + timedelta(hours=1), 'aud': 'senha', 'email': email}
@@ -400,7 +416,7 @@ class SiteViews:
         if token_data:
             aud = token_data['aud']
             email = token_data['email']
-            user = User.by_username(email)
+            user = User.by_email(email)
             if user and aud == 'senha':
                 # direciona para página de recuperação de senha
                 return dict()
@@ -422,7 +438,7 @@ class SiteViews:
             if token_data:
                 aud = token_data['aud']
                 email = token_data['email']
-                user = User.by_username(email)
+                user = User.by_email(email)
                 password = self.request.params['password']
                 cpassword = self.request.params['cpassword']
 
