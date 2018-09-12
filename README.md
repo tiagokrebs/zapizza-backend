@@ -92,4 +92,6 @@ git push heroku master
 snap run heroku open
 snap run heroku logs -t
 snap run heroku pg:psql
+snap run heroku bash
+snap run heroku python
 ```

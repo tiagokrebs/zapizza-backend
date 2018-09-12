@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
 python setup.py develop
-initialize_db production_heroku.ini
+#initialize_db production_heroku.ini
 python runapp.py
