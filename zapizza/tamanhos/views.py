@@ -41,9 +41,9 @@ class TamanhoSchema(colander.MappingSchema):
     quant_bordas = colander.SchemaNode(colander.Integer(),
                                         name='quant_bordas', missing=colander.required,
                                         missing_msg='Campo obrigatório',
-                                        validator=colander.Range(min=1, max=99,
-                                                                 min_err='${val} é menor que a quantidade mínima ${min}',
-                                                                 max_err='${val} é maior que a quantidade máxima ${max}'),
+                                        validator=colander.Range(min=0, max=99,
+                                                                 min_err='A quantidade mínima de sabores é 1',
+                                                                 max_err='A quanidade máxima de sabores é 99'),
                                         title='Quantidade de bordas', description='Quantidade de bordas do tamanho',
                                         toogle='Informe a quantidade de bordas para o tamanho'
                                         )
