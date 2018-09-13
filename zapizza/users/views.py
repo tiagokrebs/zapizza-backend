@@ -80,7 +80,7 @@ class UserSchema(colander.MappingSchema):
                                                             colander.Length(min=3, max=120,
                                                                             min_err='informe no mínimo 3 caracteres',
                                                                             max_err='Informa no máximo 120 caracteres')),
-                                     title='Primeiro Nome', description='Primeiro nome do usuário')
+                                     title='Primeiro nome', description='Primeiro nome do usuário')
     last_name = colander.SchemaNode(colander.String(),
                                     name='last_name', missing=colander.required,
                                     missing_msg='Campo obrigatório',
@@ -89,7 +89,7 @@ class UserSchema(colander.MappingSchema):
                                                            colander.Length(min=3, max=120,
                                                                            min_err='informe no mínimo 3 caracteres',
                                                                            max_err='Informa no máximo 120 caracteres')),
-                                    title='Último Nome', description='Último nome do usuário')
+                                    title='Último nome', description='Último nome do usuário')
 
 # todo: rever permissoes para interação de editores com users
 # todo: 'super' deve ser apenas para register e confirm
@@ -197,10 +197,11 @@ class UserViews:
         if appstruct['username'] != self.context.username:
             self.context.username = appstruct['username']
             headers = remember(self.request, self.context.username)
-            return HTTPFound(location=self.request.current_route_url(username=self.current_user.username),
-                             headers=headers)
+            # return HTTPFound(location=self.request.current_route_url(username=self.current_user.username),
+            #                 headers=headers)
 
-        return HTTPFound(location=self.request.current_route_url())
+        # return HTTPFound(location=self.request.current_route_url())
+        return HTTPFound(location=self.request.route_url('home'))
 
 
     @view_config(route_name='users_delete')

@@ -12,7 +12,8 @@
     <div class="col-sm-16">
         <div class="card">
             <div class="card-header">
-                <h5 class="m-0">Informe a lista de tamanhos</h5>
+                <h5 class="m-0 pull-left">Informe a lista de tamanhos</h5>
+                <a href="{{ request.route_url('tamanhos_add') }}" class="btn bt-sm btn-primary">Novo</a>
             </div>
             <div class="card-block">
                 <table class="table " id="dataTables-simple">
@@ -34,11 +35,22 @@
                         <td class="center">{{ tamanho.quant_bordas }}</td>
                         <td class="center">{{ tamanho.quant_fatias }}</td>
                         <td>
-                            <a href="" class="btn btn-link btn-sm" style="color:#d4c3ba" data-toggle="popover" data-content="Clique aqui para editar o registro"><i class="fa fa-pencil" ></i></a>
-                            <a href="" class="btn btn-link btn-sm" style="color:#d4c3ba" data-toggle="popover" data-content="Clique aqui para desativar o registro"><i class="fa fa-ban"></i></a>
-                            <a href="" class="btn btn-link btn-sm" style="color:#d4c3ba" data-toggle="popover" data-content="Clique aqui para remover o registro"><i class="fa fa-trash"></i></a>
+                            <form method="POST">
+                                <a href="{{ request.route_url('tamanhos_edit', hashid=tamanho.hash_id) }}" class="btn btn-link btn-sm" style="color:#d4c3ba" data-toggle="popover" data-content="Clique aqui para editar o registro"><i class="fa fa-pencil" ></i></a>
+                                {% if tamanho.ativo %}
+                                <a href="{{ request.route_url('tamanhos_disable', hashid=tamanho.hash_id) }}" class="btn btn-link btn-sm" style="color:#d4c3ba" data-toggle="popover" data-content="Clique aqui para desativar o registro"><i class="fa fa-ban"></i></a>
+                                {% else %}
+                                <a href="{{ request.route_url('tamanhos_enable', hashid=tamanho.hash_id) }}" class="btn btn-link btn-sm" style="color:#d4c3ba" data-toggle="popover" data-content="Clique aqui para ativar o registro"><i class="fa fa-check"></i></a>
+                                {% endif %}
+                            </form>
                         </td>
-                        <td><span class="status success">Ativo</span></td>
+                        <td>
+                            {% if tamanho.ativo %}
+                            <span class="status success">Ativo</span>
+                            {% else %}
+                            <span class="status danger">Inativo</span>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                     </tbody>
@@ -135,45 +147,7 @@
 <script src="{{ request.static_url('zapizza.site:static/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ request.static_url('zapizza.site:static/vendor/datatables/js/dataTables.bootstrap4.js') }}"></script>
 <script src="{{ request.static_url('zapizza.site:static/vendor/datatables/js/dataTables.responsive.min.js') }}"></script>
-{# todo: inserir script em arquivo .js e atualizar api DataTables para mais recente#}
-<script>
-      "use strict";
-    $(document).on('ready', function() {
-                $('#dataTables-simple').DataTable({
-                        responsive: true,
-                        pageLength:50,
-                        "lengthMenu": [ 50, 100, 200 ],
-                        sPaginationType: "full_numbers",
-                        oLanguage: {
-                            "sEmptyTable": "Nenhum registro encontrado",
-                            "sInfo": "_TOTAL_ registros (_START_ até _END_)",
-                            "sInfoEmpty": "Nenhum registro encontrado",
-                            "sInfoFiltered": " - filtrados de _MAX_ registros",
-                            "sInfoThousands": ".",
-                            "sLengthMenu": "Exibir _MENU_ registros",
-                            "sLoadingRecords": "Carregando...",
-                            "sProcessing": "Processando...",
-                            "sSearch": "Pesquisar",
-                            "sZeroRecords": "Nenhum registro encontrado",
-                            oPaginate: {
-                                sFirst: "<<",
-                                sPrevious: "<",
-                                sNext: ">",
-                                sLast: ">>"
-                            }
-                        }
-                    });
-            });
-        </script>
-{# todo: inserir script em arquivo .js #}
-<script>
-    "use strict";
-    $(function () {
-          $('[data-toggle="popover"]').popover({
-          trigger: 'hover',
-          placement: 'top',
-          fallbackPlacement: 'flip'
-          })
-    })
-</script>
+<script src="{{ request.static_url('zapizza.site:static/js/datatables.js') }}"></script>
+{# Popover #}
+<script src="{{ request.static_url('zapizza.site:static/js/popover.js') }}"></script>
 {% endblock %}

@@ -41,11 +41,11 @@ def main(global_config, **settings):
                      factory='.tamanhos.models.tamanho_factory')
     config.add_route('tamanhos_add', '/tamanhos/add',
                      factory='.tamanhos.models.tamanho_factory')
-    config.add_route('tamanhos_view', '/tamanhos/{hashid}',
+    config.add_route('tamanhos_edit', '/tamanhos/{hashid}/edit',
                      factory='.tamanhos.models.tamanho_factory')
-    config.add_route('tamanhos_profile_edit', '/tamanhos/{hashid}/profile',
+    config.add_route('tamanhos_enable', '/tamanhos/{hashid}/enable',
                      factory='.tamanhos.models.tamanho_factory')
-    config.add_route('tamanhos_delete', '/tamanhos/{hashid}/delete',
+    config.add_route('tamanhos_disable', '/tamanhos/{hashid}/disable',
                      factory='.tamanhos.models.tamanho_factory')
 
     # To Do routes with route factory

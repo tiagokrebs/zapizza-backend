@@ -27,6 +27,6 @@ def generate_hash(salt, listt):
 
 
 def decode_hash(salt, hashh):
-    salt += 'zap ' + salt
-    hashid = Hashids(salt=salt)
+    salt = 'zap ' + salt
+    hashid = Hashids(salt=salt, min_length=6)
     return hashid.decode(hashh)

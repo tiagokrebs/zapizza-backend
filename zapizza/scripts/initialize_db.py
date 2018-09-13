@@ -72,7 +72,8 @@ def main(argv=sys.argv):
                 sigla=tamanho['sigla'],
                 quant_sabores=tamanho['quant_sabores'],
                 quant_bordas=tamanho['quant_bordas'],
-                quant_fatias=tamanho['quant_fatias']
+                quant_fatias=tamanho['quant_fatias'],
+                ativo=tamanho['ativo']
             )
             lista_chaves = [empresa.id, tamanho['id']]
             t.hash_id = generate_hash('tamanhos', lista_chaves)

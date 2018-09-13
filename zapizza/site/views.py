@@ -1,4 +1,4 @@
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from pyramid.security import remember, forget
 from pyramid.view import (
     view_config,
@@ -65,13 +65,16 @@ class SiteViews:
     def not_found(self):
         return dict()
 
-    @forbidden_view_config()
+    @forbidden_view_config(renderer='templates/forbidden.jinja2')
     def forbidden(self):
         """
         Ao encontrar uma rota não autorizada usuário é direcionado para /login
         Origem da requisição é armazenada em came_from como input hiden em template de login
         Após o login caso efetuado com sucesso a url de came_from é utilizada ao invés de /home
         """
+        if self.current_user:
+            return dict()
+
         request = self.request
         login_url = request.route_url('login')
         referrer = request.url
