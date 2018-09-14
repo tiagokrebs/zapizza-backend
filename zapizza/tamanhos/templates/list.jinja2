@@ -4,7 +4,7 @@
 <div class="row  align-items-center justify-content-between">
     <div class="col-11 col-sm-12 page-title">
         <h3>Tamanhos</h3>
-        <p>Cadastros</p>
+        <p>Gerencie a sua lista de tamanhos disponíveis</p>
     </div>
 </div>
 
@@ -12,8 +12,12 @@
     <div class="col-sm-16">
         <div class="card">
             <div class="card-header">
-                <h5 class="m-0 pull-left">Informe a lista de tamanhos</h5>
-                <a href="{{ request.route_url('tamanhos_add') }}" class="btn bt-sm btn-primary">Novo</a>
+                <h6 class="card-tile pull-left">Informe a lista de tamanhos</h6>
+                <ul class="nav nav-pills card-header-pills pull-right">
+                    <li class="nav-item">
+                        <a href="{{ request.route_url('tamanhos_add') }}" class="btn btn-sm btn-outline-secondary btn-round"><i class="fa fa-plus"></i> <span class="text">Novo</span></a>
+                    </li>
+                </ul>
             </div>
             <div class="card-block">
                 <table class="table " id="dataTables-simple">

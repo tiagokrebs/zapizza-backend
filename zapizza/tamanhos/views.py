@@ -42,7 +42,7 @@ class TamanhoSchema(colander.MappingSchema):
                                         name='quant_bordas', missing=colander.required,
                                         missing_msg='Campo obrigatório',
                                         validator=colander.Range(min=0, max=99,
-                                                                 min_err='A quantidade mínima de sabores é 1',
+                                                                 min_err='A quantidade mínima de sabores é 0',
                                                                  max_err='A quanidade máxima de sabores é 99'),
                                         title='Quantidade de bordas', description='Quantidade de bordas do tamanho',
                                         toogle='Informe a quantidade de bordas para o tamanho'
@@ -50,8 +50,8 @@ class TamanhoSchema(colander.MappingSchema):
     quant_fatias = colander.SchemaNode(colander.Integer(),
                                         name='quant_fatias', missing=colander.null,
                                         validator=colander.Range(min=1, max=99,
-                                                                 min_err='${val} é menor que a quantidade mínima ${min}',
-                                                                 max_err='${val} é maior que a quantidade máxima ${max}'),
+                                                                 min_err='A quantidade mínima de fatias é 1',
+                                                                 max_err='A quantidade máxima de fatias é 1'),
                                         title='Quantidade de fatias', description='Quantidade de fatias do tamanho',
                                         toogle='Informe a quantidade de fatias para o tamanho'
                                         )

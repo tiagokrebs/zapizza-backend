@@ -96,9 +96,10 @@ $(document).on("ready", function(){
         var url = window.location;        
         function menuitems(){            
             if(body_1.hasClass('horizontal-menu') === false){
-                var element = $('.sidebar-left #side-menu li a').filter(function() {
-                    return this.href == url;
-                }).addClass('active').parent("li").addClass('active').closest('.nav').addClass('in').slideDown().prev().addClass('show').closest('.nav').slideDown().addClass('in').prev().addClass('show');
+                // define side-menu aberto
+                //var element = $('.sidebar-left #side-menu li a').filter(function() {
+                //    return this.href == url;
+                //}).addClass('active').parent("li").addClass('active').closest('.nav').addClass('in').slideDown().prev().addClass('show').closest('.nav').slideDown().addClass('in').prev().addClass('show');
 
                 $('.sidebar-left .nav li a').on('click', function(){
                     if( $(this).hasClass('menudropdown')=== true){ 

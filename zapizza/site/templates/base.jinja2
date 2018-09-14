@@ -203,9 +203,9 @@ block scripts -> scripts
         <li class="nav-item">
             <a href="javascript:void(0)" class="menudropdown nav-link">Produtos<i class="fa fa-angle-down"></i></a>
             <ul class="nav flex-column nav-second-level">
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-beer"></i>Bebidas</a></li>
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-circle-o"></i>Bordas</a></li>
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-cutlery"></i>Sabores</a></li>
+                <li class="nav-item "> <a href="{{ request.route_url('home') }}" class="nav-link"><i class="fa fa-beer"></i>Bebidas</a></li>
+                <li class="nav-item "> <a href="{{ request.route_url('home') }}" class="nav-link"><i class="fa fa-circle-o"></i>Bordas</a></li>
+                <li class="nav-item "> <a href="{{ request.route_url('home') }}" class="nav-link"><i class="fa fa-cutlery"></i>Sabores</a></li>
                 <li class="nav-item "> <a href="{{ request.route_url('tamanhos_list') }}" class="nav-link"><i class="fa fa-pie-chart"></i>Tamanhos</a></li>
 
             </ul>
@@ -214,15 +214,15 @@ block scripts -> scripts
         <li class="nav-item">
             <a href="javascript:void(0)" class="menudropdown nav-link">Clientes<i class="fa fa-angle-down"></i></a>
             <ul class="nav flex-column nav-second-level">
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-map-marker"></i>Bairros</a></li>
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-map-o"></i>Cidades</a></li>
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-users"></i>Clientes</a></li>
-                <li class="nav-item "> <a href="" class="nav-link"><i class="fa fa-road"></i>Logradouros</a></li>
+                <li class="nav-item "> <a href="{{ request.route_url('home') }}" class="nav-link"><i class="fa fa-map-marker"></i>Bairros</a></li>
+                <li class="nav-item "> <a href="{{ request.route_url('home') }}" class="nav-link"><i class="fa fa-map-o"></i>Cidades</a></li>
+                <li class="nav-item "> <a href="{{ request.route_url('home') }}" class="nav-link"><i class="fa fa-users"></i>Clientes</a></li>
+                <li class="nav-item "> <a href="{{ request.route_url('home') }}" class="nav-link"><i class="fa fa-road"></i>Logradouros</a></li>
             </ul>
         </li>
         {# pedidos #}
         <li class="nav-item">
-            <a href="" class="nav-link"><i class="fa fa-id-card-o"></i>Pedidos</a>
+            <a href="{{ request.route_url('home') }}" class="nav-link"><i class="fa fa-id-card-o"></i>Pedidos</a>
         </li>
     </ul>
     <hr>
