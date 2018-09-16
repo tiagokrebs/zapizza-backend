@@ -36,29 +36,29 @@ def main(global_config, **settings):
     config.add_route('users_delete', '/users/{username}/delete',
                      factory='.users.models.user_factory')
 
-    # Rotas Tamanhos com route factory
+    # Rotas Pizza com route factory
+    # Tamanho
     config.add_route('tamanhos_list', '/tamanhos',
-                     factory='.tamanhos.models.tamanho_factory')
+                     factory='.pizzas.models.tamanho_factory')
     config.add_route('tamanhos_add', '/tamanhos/add',
-                     factory='.tamanhos.models.tamanho_factory')
+                     factory='.pizzas.models.tamanho_factory')
     config.add_route('tamanhos_edit', '/tamanhos/{hashid}/edit',
-                     factory='.tamanhos.models.tamanho_factory')
+                     factory='.pizzas.models.tamanho_factory')
     config.add_route('tamanhos_enable', '/tamanhos/{hashid}/enable',
-                     factory='.tamanhos.models.tamanho_factory')
+                     factory='.pizzas.models.tamanho_factory')
     config.add_route('tamanhos_disable', '/tamanhos/{hashid}/disable',
-                     factory='.tamanhos.models.tamanho_factory')
-
-    # To Do routes with route factory
-    config.add_route('todos_list', '/todos',
-                     factory='.todos.models.todo_factory')
-    config.add_route('todos_add', '/todos/add',
-                     factory='.todos.models.todo_factory')
-    config.add_route('todos_view', '/todos/{id}',
-                     factory='.todos.models.todo_factory')
-    config.add_route('todos_edit', '/todos/{id}/edit',
-                     factory='.todos.models.todo_factory')
-    config.add_route('todos_delete', '/todos/{id}/delete',
-                     factory='.todos.models.todo_factory')
+                     factory='.pizzas.models.tamanho_factory')
+    # Sabor
+    config.add_route('sabores_list', '/sabores',
+                     factory='.pizzas.models.sabor_factory')
+    config.add_route('sabores_add', '/sabores/add',
+                     factory='.pizzas.models.sabor_factory')
+    config.add_route('sabores_edit', '/sabores/{hashid}/edit',
+                     factory='.pizzas.models.sabor_factory')
+    config.add_route('sabores_enable', '/sabores/{hashid}/enable',
+                     factory='.pizzas.models.sabor_factory')
+    config.add_route('sabores_disable', '/sabores/{hashid}/disable',
+                     factory='.pizzas.models.sabor_factory')
 
     # Factory da sessão
     session_secret = settings['session.secret']

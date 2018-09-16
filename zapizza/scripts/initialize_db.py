@@ -7,12 +7,20 @@ from pyramid.config import Configurator
 from pyramid_sqlalchemy import Session
 from pyramid_sqlalchemy.meta import metadata
 from pyramid.paster import get_appsettings, setup_logging
+from sqlalchemy import Sequence
 
 from ..site.hashid import generate_hash
 from ..empresas.models import Empresa, sample_empresas
 from ..users.models import User, sample_users
-from ..tamanhos.models import Tamanho, sample_tamanhos
+from ..pizzas.models import (
+    Tamanho,
+    sample_tamanhos,
+    Sabor,
+    sample_sabores,
+    SaborTamanho
+)
 
+# todo: separar script para inicialização do bd (apenas com usuários) e inicialização dos dados (pizza...)
 
 def usage(argv):
     cmd = os.path.basename(argv[0])
@@ -42,6 +50,8 @@ def main(argv=sys.argv):
             lista_chaves = [empresa['id']]
             e.hash_id = generate_hash('empresas', lista_chaves)
             Session.add(e)
+            seq = Sequence('empresas_id_seq')
+            Session.execute(seq)
 
         # obtem empresa pai para adicionar os filhos
         empresa = Empresa.by_razao(sample_empresas[0]['razao_social'])
@@ -63,6 +73,8 @@ def main(argv=sys.argv):
             u.hash_id = generate_hash('users', lista_chaves)
             u.empresa = empresa
             Session.add(u)
+            seq = Sequence('users_id_seq')
+            Session.execute(seq)
 
         # adiciona tamanhos
         for tamanho in sample_tamanhos:
@@ -79,3 +91,41 @@ def main(argv=sys.argv):
             t.hash_id = generate_hash('tamanhos', lista_chaves)
             t.empresa = empresa
             Session.add(t)
+            Session.flush()
+            seq = Sequence('tamanhos_id_seq')
+            Session.execute(seq)
+
+        # adiciona sabores
+        for sabor in sample_sabores:
+            s = Sabor(
+                id=sabor['id'],
+                descricao=sabor['descricao'],
+                ativo=sabor['ativo']
+            )
+            lista_chaves = [empresa.id, sabor['id']]
+            s.hash_id = generate_hash('sabores', lista_chaves)
+            s.empresa = empresa
+            Session.add(s)
+            Session.flush()
+            seq = Sequence('sabores_id_seq')
+            Session.execute(seq)
+
+            # adiciona tamanhos dos sabores
+            for tamanho in sample_tamanhos:
+                if tamanho['sigla'] == 'B':
+                    valor = 20
+                elif tamanho['sigla'] == 'P':
+                    valor = 25
+                elif tamanho['sigla'] == 'M':
+                    valor = 30
+                elif tamanho['sigla'] == 'G':
+                    valor = 35
+                elif tamanho['sigla'] == 'F':
+                    valor = 40
+                st = SaborTamanho(
+                    sabor_id=sabor['id'],
+                    tamanho_id=tamanho['id'],
+                    valor=valor
+                )
+                Session.add(st)
+

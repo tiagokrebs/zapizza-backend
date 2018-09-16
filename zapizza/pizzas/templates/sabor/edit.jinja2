@@ -1,0 +1,43 @@
+{% extends "zapizza:site/templates/base.jinja2" %}
+{% block title %}Perfil{% endblock %}
+{% block content %}
+<div class="row  align-items-center justify-content-between">
+    <div class="col-11 col-sm-12 page-title">
+        <h3>Tamanhos</h3>
+        <p>Cadastro</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-16">
+        <div class="card">
+            <form method="POST">
+                <div class="card-header">
+                    <h6 class="card-tile pull-left">Informe os sabores de pizza disponíveis</h6>
+                    <br>
+                </div>
+                <div class="card-block">
+                    <div>
+                        {# escrito a mao utilizando funções Deform #}
+                        <div class="row justify-content-center">
+                            <div class="col-md-10 ">
+                                <div class="form-group row">
+                                    <div class="col-lg-8 col-md-8 {% if edit_form['descricao'].error %} has-danger {% endif %}" >
+                                        <label class="form-control-label">{{ edit_form['descricao'].title }}</label>
+                                        {% if edit_form['descricao'].required %} <span class="form-control-label">*</span> {% endif %}
+                                        {{ edit_form['descricao'].serialize() | safe }}
+                                        {% if edit_form['descricao'].error %} <span class="form-control-label">{{ edit_form['descricao'].error.messages()[0] }}</span> {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ request.route_url('sabores_list') }}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" name="form.submitted" class="btn btn-success pull-right">Gravar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

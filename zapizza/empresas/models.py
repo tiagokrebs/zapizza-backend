@@ -21,6 +21,7 @@ class Empresa(BaseObject):
 
     users = relationship('User', back_populates='empresa', cascade='all, delete')
     tamanhos = relationship('Tamanho', back_populates='empresa', cascade='all, delete')
+    sabores = relationship('Sabor', back_populates='empresa', cascade='all, delete')
 
     # método busca usuario por razao
     @classmethod
