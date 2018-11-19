@@ -39,6 +39,12 @@ class User(BaseObject):
         (Allow, 'group:editors', 'edit'),
         (Allow, 'group:users', 'view'),
     ]
+    #def __acl__(self):
+    #    return [
+    #        (Allow, 'group:admins', 'super'),
+    #        (Allow, 'group:editors', 'edit'),
+    #        (Allow, 'group:users', 'view'),
+    #    ]
 
     # propriedade com nome e sobrenome do usuário
     @property

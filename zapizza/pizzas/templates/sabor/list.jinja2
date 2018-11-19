@@ -17,6 +17,9 @@
                     <li class="nav-item">
                         <a href="{{ request.route_url('sabores_add') }}" class="btn btn-sm btn-outline-secondary btn-round"><i class="fa fa-plus"></i> <span class="text">Novo</span></a>
                     </li>
+                    <li>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"> Inputs Modal </button>
+                    </li>
                 </ul>
             </div>
             <div class="card-block">
@@ -58,84 +61,6 @@
     </div>
 </div>
 
-{# tabela adminux exemplo #}
-{#<!--<div class="row">
-    <div class="col-sm-16">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">Tables <small>Datatables</small></h5>
-            </div>
-            <div class="card-block">
-                <div id="dataTables-example_wrapper" class="dataTables_wrapper  dt-bootstrap4 no-footer">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="dataTables_length" id="dataTables-example_length">
-                                <label>Show
-                                    <select name="dataTables-example_length" aria-controls="dataTables-example" class="form-control input-sm">
-                                        <option value="10">10</option>
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                    </select> entries
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-8 text-right">
-                            <div id="dataTables-example_filter" class="dataTables_filter">
-                                <label>Search:<input type="search" class="form-control input-sm" placeholder="" aria-controls="dataTables-example">
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-16">
-                            <table class="table  dataTable no-footer dtr-inline" id="dataTables-example" role="grid" aria-describedby="dataTables-example_info" style="width: 880px;">
-                                <thead>
-                                <tr role="row"><th class="sorting_asc" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" style="width: 123px;" aria-sort="ascending" aria-label="User : activate to sort column descending">User </th><th class="sorting" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" style="width: 126px;" aria-label="Email: activate to sort column ascending">Email</th><th class="sorting" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" style="width: 119px;" aria-label="Phone: activate to sort column ascending">Phone</th><th class="sorting" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" style="width: 53px;" aria-label="Project: activate to sort column ascending">Project</th><th class="sorting" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" style="width: 61px;" aria-label="status: activate to sort column ascending">status</th><th class="sorting" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" style="width: 140px;" aria-label="socials: activate to sort column ascending">socials</th></tr>
-                                </thead>
-                                <tbody>
-                                <tr class="odd" role="row">
-                                    <td tabindex="0" class="sorting_1"><img src="../img/team.png" alt="" class="gridpic">Alone Guy</td>
-                                    <td>info@maxartkiller.in</td>
-                                    <td>+91 000 000 0000</td>
-                                    <td class="center">18</td>
-                                    <td class="center"><span class="status success">Active</span></td>
-                                    <td class="center"><a href="" class=" btn btn-link btn-sm "><i class="fa fa-facebook"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-google-plus"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-twitter"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-envelope"></i></a></td>
-                                </tr><tr class="even" role="row">
-                                    <td class="sorting_1" tabindex="0"><img src="../img/team.png" alt="" class="gridpic">Alone Guy</td>
-                                    <td>info@maxartkiller.in</td>
-                                    <td>+91 000 000 0000</td>
-                                    <td class="center">18</td>
-                                    <td class="center"><span class="status danger">Inactive</span></td>
-                                    <td class="center"><a href="" class=" btn btn-link btn-sm "><i class="fa fa-facebook"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-google-plus"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-twitter"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-envelope"></i></a></td>
-                                </tr><tr class="odd" role="row">
-                                    <td class="sorting_1" tabindex="0"><img src="../img/team.png" alt="" class="gridpic">Alone Guy</td>
-                                    <td>info@maxartkiller.in</td>
-                                    <td>+91 000 000 0000</td>
-                                    <td class="center">20</td>
-                                    <td class="center"><span class="status warning">Inactive</span></td>
-                                    <td class="center"><a href="" class=" btn btn-link btn-sm "><i class="fa fa-facebook"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-google-plus"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-twitter"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-envelope"></i></a></td>
-                                </tr><tr class="even" role="row">
-                                    <td tabindex="0" class="sorting_1"><img src="../img/team.png" alt="" class="gridpic">Astha Smith</td>
-                                    <td>info@maxartkiller.in</td>
-                                    <td>+91 000 000 0000</td>
-                                    <td class="center">10</td>
-                                    <td class="center"><span class="status success">Active</span></td>
-                                    <td class="center"><a href="" class=" btn btn-link btn-sm "><i class="fa fa-facebook"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-google-plus"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-twitter"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-envelope"></i></a></td>
-                                </tr><tr class="odd" role="row">
-                                    <td class="sorting_1" tabindex="0"><img src="../img/team.png" alt="" class="gridpic">Astha Smith</td>
-                                    <td>info@maxartkiller.in</td>
-                                    <td>+91 000 000 0000</td>
-                                    <td class="center">17</td>
-                                    <td class="center"><span class="status danger">Inactive</span></td>
-                                    <td class="center"><a href="" class=" btn btn-link btn-sm "><i class="fa fa-facebook"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-google-plus"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-twitter"></i></a> <a href="" class="btn btn-link btn-sm"><i class="fa fa-envelope"></i></a></td>
-                                </tr></tbody>
-                            </table></div></div><div class="row"><div class="col-md-7"><div class="dataTables_info" id="dataTables-example_info" role="status" aria-live="polite">Showing 1 to 5 of 12 entries</div></div><div class="col-md-9"><div class="dataTables_paginate paging_full_numbers" id="dataTables-example_paginate"><ul class="pagination pull-right"><li class="paginate_button page-item first disabled" id="dataTables-example_first"><a href="#" aria-controls="dataTables-example" data-dt-idx="0" tabindex="0" class="page-link">&lt;&lt;</a></li><li class="paginate_button page-item previous disabled" id="dataTables-example_previous"><a href="#" aria-controls="dataTables-example" data-dt-idx="1" tabindex="0" class="page-link">&lt;</a></li><li class="paginate_button page-item active"><a href="#" aria-controls="dataTables-example" data-dt-idx="2" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item "><a href="#" aria-controls="dataTables-example" data-dt-idx="3" tabindex="0" class="page-link">2</a></li><li class="paginate_button page-item "><a href="#" aria-controls="dataTables-example" data-dt-idx="4" tabindex="0" class="page-link">3</a></li><li class="paginate_button page-item next" id="dataTables-example_next"><a href="#" aria-controls="dataTables-example" data-dt-idx="5" tabindex="0" class="page-link">&gt;</a></li><li class="paginate_button page-item last" id="dataTables-example_last"><a href="#" aria-controls="dataTables-example" data-dt-idx="6" tabindex="0" class="page-link">&gt;&gt;</a></li></ul></div></div></div></div>
-                <!-- /.table-responsive
-            </div>
-        </div>
-    </div>
-</div>-->#}
 
 {% endblock %}
 {% block scripts %}

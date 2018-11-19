@@ -1,20 +1,23 @@
-from pyramid.httpexceptions import HTTPFound, HTTPForbidden
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden, HTTPInternalServerError
 from pyramid.security import remember, forget
 from pyramid.view import (
     view_config,
     notfound_view_config,
-    forbidden_view_config
+    forbidden_view_config,
+    exception_view_config
 )
-import re
+from pyramid.response import Response
 from ..users.models import User
 from ..empresas.models import Empresa
 from ..site.token import confirm_token
 from ..site.email import send_async_templated_mail
 from ..site.token import generate_token
 from ..site.hashid import generate_hash
+from ..errors import InputError
 from datetime import datetime, timedelta
 from pyramid_sqlalchemy import Session
-
+import json
+import re
 
 class SiteViews:
     def __init__(self, context, request):
@@ -61,17 +64,17 @@ class SiteViews:
             email=email
             )
 
-    @notfound_view_config(renderer='templates/notfound.jinja2')
+    """@notfound_view_config(renderer='templates/notfound.jinja2')
     def not_found(self):
-        return dict()
+        return dict()"""
 
-    @forbidden_view_config(renderer='templates/forbidden.jinja2')
+    """@forbidden_view_config(renderer='templates/forbidden.jinja2')
     def forbidden(self):
-        """
+        """"""
         Ao encontrar uma rota não autorizada usuário é direcionado para /login
         Origem da requisição é armazenada em came_from como input hiden em template de login
         Após o login caso efetuado com sucesso a url de came_from é utilizada ao invés de /home
-        """
+        """"""
         if self.current_user:
             return dict()
 
@@ -82,7 +85,7 @@ class SiteViews:
             referrer = '/'  # não usar referrer igual url de login
         came_from = request.params.get('came_from', referrer)
         url = self.request.route_url('login', _query=dict(came_from=came_from))
-        return HTTPFound(url)
+        return HTTPFound(url)"""
 
     @view_config(route_name='login', renderer='templates/login.jinja2')
     def login(self):
@@ -115,7 +118,7 @@ class SiteViews:
             password=password,
         )
 
-    @view_config(route_name='logout')
+    @view_config(route_name='logout', permission='super')
     def logout(self):
         headers = forget(self.request)
         url = self.request.route_url('home')

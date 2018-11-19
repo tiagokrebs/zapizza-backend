@@ -3,17 +3,24 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
 from pyramid.session import SignedCookieSessionFactory
 from pyramid_sqlalchemy import metadata
-from .site.security import groupfinder
+from .site.security import groupfinder, get_user, RootFactory
 
 
 def main(global_config, **settings):
-    config = Configurator(settings=settings)
+    config = Configurator(settings=settings, root_factory=RootFactory)
     config.include('pyramid_jinja2')
     config.include('pyramid_chameleon')
     config.scan()
     config.include('pyramid_sqlalchemy')
     metadata.create_all()
     config.add_static_view(name='static', path='zapizza.site:static')
+
+    # todo: levar rotas para dentro de seus módulos
+    # API routes
+    config.add_route('api_confirm', '/api/confirm/{token}')
+    config.add_route('api_login', '/api/login')
+    config.add_route('api_logout', '/api/logout')
+    config.add_route('api_signup', '/api/signup')
 
     # Site routes
     config.add_route('home', '/')
@@ -72,5 +79,8 @@ def main(global_config, **settings):
     authz_policy = ACLAuthorizationPolicy()
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
+
+    # Objeto User disponível como um atributo de Request
+    config.add_request_method(get_user, 'user', reify=True)
 
     return config.make_wsgi_app()
