@@ -4,15 +4,30 @@ from pyramid.config import Configurator
 from pyramid.session import SignedCookieSessionFactory
 from pyramid_sqlalchemy import metadata
 from .site.security import groupfinder, get_user, RootFactory
+from .site.cors import CorsPreflightPredicate, add_cors_preflight_handler, add_cors_to_response
 
 
 def main(global_config, **settings):
     config = Configurator(settings=settings, root_factory=RootFactory)
+
+    # adiciona metodos cross origin resource sharing (CORS)
+    config.add_directive('add_cors_preflight_handler', add_cors_preflight_handler)
+    config.add_route_predicate('cors_preflight', CorsPreflightPredicate)
+    config.add_subscriber(add_cors_to_response, 'pyramid.events.NewResponse')
+    config.add_cors_preflight_handler()
+
+    # inclui dependencias
     config.include('pyramid_jinja2')
     config.include('pyramid_chameleon')
-    config.scan()
     config.include('pyramid_sqlalchemy')
+
+    # escaneia views
+    config.scan()
+
+    # cria metadados de persistencia
     metadata.create_all()
+
+    # adiciona rodas estaticas
     config.add_static_view(name='static', path='zapizza.site:static')
 
     # todo: levar rotas para dentro de seus módulos
@@ -21,6 +36,9 @@ def main(global_config, **settings):
     config.add_route('api_login', '/api/login')
     config.add_route('api_logout', '/api/logout')
     config.add_route('api_signup', '/api/signup')
+    config.add_route('api_password_forgot', '/api/forgot')
+    config.add_route('api_password_reset', '/api/reset')
+    config.add_route('api_authenticated', '/api/authenticated')
 
     # Site routes
     config.add_route('home', '/')
@@ -67,12 +85,12 @@ def main(global_config, **settings):
     config.add_route('sabores_disable', '/sabores/{hashid}/disable',
                      factory='.pizzas.models.sabor_factory')
 
-    # Factory da sessão
+    # Factory da sessao
     session_secret = settings['session.secret']
     session_factory = SignedCookieSessionFactory(session_secret)
     config.set_session_factory(session_factory)
 
-    # Políticas de segurança
+    # Politicas de segurança
     authn_policy = AuthTktAuthenticationPolicy(
         settings['auth.secret'], callback=groupfinder,
         hashalg='sha512')
@@ -80,7 +98,8 @@ def main(global_config, **settings):
     config.set_authentication_policy(authn_policy)
     config.set_authorization_policy(authz_policy)
 
-    # Objeto User disponível como um atributo de Request
+    # Objeto User disponivel como um atributo de Request
     config.add_request_method(get_user, 'user', reify=True)
 
+    # cria aplicacao
     return config.make_wsgi_app()

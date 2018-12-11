@@ -23,7 +23,7 @@ class User(BaseObject):
     empresa_id = Column(Integer, ForeignKey('empresas.id'), nullable=False)
     hash_id = Column(String(50), index=True, unique=True)
     email = Column(String(150), unique=True, nullable=False)
-    username = Column(String(120), unique=True, nullable=False)
+    username = Column(String(120), unique=True, nullable=True)
     password = Column(String(120), nullable=False)
     first_name = Column(String(120), nullable=False)
     last_name = Column(String(120), nullable=False)

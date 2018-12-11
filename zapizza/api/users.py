@@ -1,7 +1,7 @@
 from pyramid.httpexceptions import (
     HTTPOk,
-    HTTPUnauthorized,
-    HTTPConflict
+    HTTPConflict,
+    HTTPFound
 )
 from pyramid.security import remember, forget
 from pyramid.view import view_config
@@ -25,6 +25,27 @@ class ApiViews:
         self.current_user = request.user
         self.context = context
         self.request = request
+
+    @view_config(route_name='api_authenticated', renderer='json',
+                 request_method='GET')
+    def authenticated(self):
+        user = self.current_user
+        if user:
+            msg = 'Login efetuado com sucesso'
+            token_data = {'aud': 'idToken', 'username': user.username}
+            token = generate_token(request=self.request, data=token_data)
+            res = dumps(dict(
+                data=dict(
+                    code=200,
+                    message=msg,
+                    userId=user.username,
+                    idToken=token.decode('utf-8'))),
+                ensure_ascii=False)
+            return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
+
+        msg = 'Falha na autenticação'
+        res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
+        return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
     @view_config(route_name='api_confirm', permission='super',
                  renderer='json', request_method='POST')
@@ -130,49 +151,49 @@ class ApiViews:
         return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
     # todo: utilizar Deform + Schemas para validação dos atributos ver user_edit_profile
-    @view_config(route_name='reset',
-                 renderer='templates/reset.jinja2',
-                 request_method='POST')
-    def reset_handler(self):
-        """
-        Ao receber confirmação da recuperação de senha valida os dados
-        define password no registro do usuário e direciona para página de login
-        """
-        if 'form.submitted' in self.request.params:
-            token = self.request.matchdict.get('token')
-            token_data = confirm_token(request=self.request, token=token, audience='senha')
-            if token_data:
-                aud = token_data['aud']
-                email = token_data['email']
-                user = User.by_email(email)
-                password = self.request.params['password']
-                cpassword = self.request.params['cpassword']
-
-                if user and aud == 'senha':
-                    # verifica existência de password
-                    if not password:
-                        return dict(form_error='Informe um password')
-
-                    # verifica regex mínimo para password
-                    if not re.match(r".{6,120}", password):
-                        return dict(form_error='Informe um passord contendo no mínimo 6 caracteres')
-
-                    # verifica existência de cpassword
-                    if not cpassword:
-                        return dict(form_error='Informe a confirmação do password')
-
-                    # verifia igualdadade entre passwords
-                    if cpassword != password:
-                        return dict(form_error='A confirmação do password incorreta')
-
-                    # ajusta password no registro e direciona
-                    # Session.query(user).filter(user.email == email). \
-                    #    update({user.password: password}, synchorize_session=False)
-                    user.password = password
-                    url = self.request.route_url('login')
-                    return HTTPFound(url)
-
-        return dict(form_error='Token inválido')
+    # @view_config(route_name='reset',
+    #              renderer='templates/reset.jinja2',
+    #              request_method='POST')
+    # def reset_handler(self):
+    #     """
+    #     Ao receber confirmação da recuperação de senha valida os dados
+    #     define password no registro do usuário e direciona para página de login
+    #     """
+    #     if 'form.submitted' in self.request.params:
+    #         token = self.request.matchdict.get('token')
+    #         token_data = confirm_token(request=self.request, token=token, audience='senha')
+    #         if token_data:
+    #             aud = token_data['aud']
+    #             email = token_data['email']
+    #             user = User.by_email(email)
+    #             password = self.request.params['password']
+    #             cpassword = self.request.params['cpassword']
+    #
+    #             if user and aud == 'senha':
+    #                 # verifica existência de password
+    #                 if not password:
+    #                     return dict(form_error='Informe um password')
+    #
+    #                 # verifica regex mínimo para password
+    #                 if not match(r".{6,120}", password):
+    #                     return dict(form_error='Informe um passord contendo no mínimo 6 caracteres')
+    #
+    #                 # verifica existência de cpassword
+    #                 if not cpassword:
+    #                     return dict(form_error='Informe a confirmação do password')
+    #
+    #                 # verifia igualdadade entre passwords
+    #                 if cpassword != password:
+    #                     return dict(form_error='A confirmação do password incorreta')
+    #
+    #                 # ajusta password no registro e direciona
+    #                 # Session.query(user).filter(user.email == email). \
+    #                 #    update({user.password: password}, synchorize_session=False)
+    #                 user.password = password
+    #                 url = self.request.route_url('login')
+    #                 return HTTPFound(url)
+    #
+    #     return dict(form_error='Token inválido')
 
     @view_config(route_name='api_login', renderer='json',
                  request_method='POST')
@@ -182,13 +203,13 @@ class ApiViews:
 
         if 'username' not in json_body:
             msg = 'Username não informado'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
         username = json_body['username']
 
         if 'password' not in json_body:
             msg = 'Password não informado'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
         password = json_body['password']
 
@@ -196,100 +217,110 @@ class ApiViews:
         if user and user.password == password:
             headers = remember(request, user.username)
             msg = 'Login efetuado com sucesso'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            token_data = {'aud': 'idToken', 'username': user.username}
+            token = generate_token(request=self.request, data=token_data)
+            res = dumps(dict(
+                data=dict(
+                    code=200,
+                    message=msg,
+                    userId=user.username,
+                    idToken=token.decode('utf-8'))),
+                ensure_ascii=False)
             return HTTPOk(headers=headers, body=res, content_type='application/json; charset=UTF-8')
 
-        msg = 'Username ou senha inválido'
-        res = dumps(dict(message=msg), ensure_ascii=False)
+        msg = 'Username ou senha inválidos'
+        res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
         return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
     @view_config(route_name='api_logout', permission='super')
     def logout(self):
         headers = forget(self.request)
         msg = 'Logout efetuado com sucesso'
-        res = dumps(dict(message=msg), ensure_ascii=False)
+        res = dumps(dict(data=dict(code=200, message=msg)), ensure_ascii=False)
         return HTTPOk(headers=headers, body=res, content_type='application/json; charset=UTF-8')
 
     @view_config(route_name='api_signup', renderer='json',
                  request_method='POST')
     def signup(self):
+        request = self.request
         json_body = self.request.json_body
 
         # verifica existência de email
         if 'email' not in json_body:
             msg = 'Informe um email'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
         email = json_body['email']
 
         # verifica uso de email por usuário existente
         if User.by_email(email):
             msg = 'O email informado já está cadastrado'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
         # verifica regex mínimo para email
         if not match(r"[^@]+@[^@]+\.[^@]+", email):
             msg = 'Informe um email válido'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
-        # verifica existência de username
-        if 'username' not in json_body:
-            msg = 'Informe um username'
-            res = dumps(dict(message=msg), ensure_ascii=False)
-            return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
-        username = json_body['username']
-        
-        # verifica uso de username por usuário existente
-        if User.by_username(username):
-            msg = 'O username informado já está cadastrado'
-            res = dumps(dict(message=msg), ensure_ascii=False)
-            return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
-
-        # verifica regex mínimo para username
-        if not match(r"^[a-zA-Z0-9]{3,120}$", username):
-            msg = 'Username inválido'
-            res = dumps(dict(message=msg), ensure_ascii=False)
-            return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
+        username = email
+        # # verifica existência de username
+        # if 'username' not in json_body:
+        #     msg = 'Informe um username'
+        #     res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
+        #     return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
+        # username = json_body['username']
+        #
+        # # verifica uso de username por usuário existente
+        # if User.by_username(username):
+        #     msg = 'O username informado já está cadastrado'
+        #     res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
+        #     return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
+        #
+        # # verifica regex mínimo para username
+        # if not match(r"^[a-zA-Z0-9]{3,120}$", username):
+        #     msg = 'Username inválido'
+        #     res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
+        #     return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
         # verifica existência de password
         if 'password' not in json_body:
             msg = 'Informe um password'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
         password = json_body['password']
 
         # verifica regex mínimo para password
         if not match(r".{6,120}", password):
             msg = 'Informe um password contendo no mínimo 6 caracteres'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
-        # verifica existência de fname
-        if 'fname' not in json_body:
+        # verifica existência de firstName
+        if 'firstName' not in json_body:
             msg = 'Primeiro nome não informado'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
-        fname = json_body['fname']
+        firstname = json_body['firstName']
 
-        # verifica regex mínimo para fname
-        if fname and not match(r"^[a-zA-Z]{3,120}$", fname):
+        # verifica regex mínimo para firstName
+        if firstname and not match(r"^[a-zA-Z]{3,120}$", firstname):
             msg = 'Primeiro nome inválido'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
-        # verifica existência de lname
-        if 'lname' not in json_body:
+        # verifica existência de lastName
+        if 'lastName' not in json_body:
             msg = 'Último nome não informado'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
-        lname = json_body['lname']
+        lastname = json_body['lastName']
 
-        # verifica regex mínimo para lname
-        if lname and not match(r"^[a-zA-Z]{3,120}$", lname):
+        # verifica regex mínimo para lastName
+        if lastname and not match(r"^[a-zA-Z]{3,120}$", lastname):
             msg = 'Último nome inválido'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
         # insere empresa pai do usuário em registro e atualiza hash_id
@@ -303,8 +334,8 @@ class ApiViews:
         groups = ['group:admins']
         u = User(
             email=email, username=username,
-            password=password, first_name=fname,
-            last_name=lname, groups=groups,
+            password=password, first_name=firstname,
+            last_name=lastname, groups=groups,
             empresa_id=e.id
         )
         Session.add(u)
@@ -315,16 +346,17 @@ class ApiViews:
         # token expira em 24h, tipo registro, confirmado com email
         token_data = {'exp': datetime.utcnow() + timedelta(days=1), 'aud': 'registro', 'email': email}
         token = generate_token(request=self.request, data=token_data)
-        confirm_url = self.request.route_url('api_confirm', token=token)
+        # confirm_url = self.request.route_url('api_confirm', token=token)
+        confirm_url = request.registry.settings["cors.origin"] + '/confirma/' + token.decode('utf-8')
 
         # envio de email de confirmação
         send_async_templated_mail(request=self.request, recipients=email,
                                   template='templates/email/confirm_register',
                                   context=dict(
-                                      first_name=fname,
+                                      first_name=firstname,
                                       link=confirm_url
                                   ))
 
         msg = 'Verifique seu email para realizar a confirmação'
-        res = dumps(dict(message=msg), ensure_ascii=False)
+        res = dumps(dict(data=dict(code=200, message=msg)), ensure_ascii=False)
         return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
