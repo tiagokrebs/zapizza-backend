@@ -30,18 +30,26 @@ class ApiViews:
                  request_method='GET')
     def authenticated(self):
         user = self.current_user
+        request = self.request
         if user:
+            headers = remember(request, user.username)
             msg = 'Login efetuado com sucesso'
             token_data = {'aud': 'idToken', 'username': user.username}
             token = generate_token(request=self.request, data=token_data)
+            if user.register_confirm:
+                confirmed = True
+            else:
+                confirmed = False
             res = dumps(dict(
                 data=dict(
                     code=200,
                     message=msg,
                     userId=user.username,
-                    idToken=token.decode('utf-8'))),
+                    idToken=token.decode('utf-8'),
+                    expiresIn=3600,
+                    emailConfirmed=confirmed)),
                 ensure_ascii=False)
-            return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
+            return HTTPOk(headers=headers, body=res, content_type='application/json; charset=UTF-8')
 
         msg = 'Falha na autenticação'
         res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
@@ -53,9 +61,9 @@ class ApiViews:
         json_body = self.request.json_body
         if 'token' not in json_body:
             msg = 'Token não informado'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
-        token = json_body['request.paramstoken']
+        token = json_body['token']
         token_data = confirm_token(request=self.request, token=token, audience='registro')
         if token_data:
             aud = token_data['aud']
@@ -65,18 +73,18 @@ class ApiViews:
                 # usuário já registrado direcionado para home
                 if self.current_user.register_confirm:
                     msg = 'Usuário já está confirmado'
-                    res = dumps(dict(message=msg), ensure_ascii=False)
+                    res = dumps(dict(data=dict(code=200, message=msg)), ensure_ascii=False)
                     return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
 
                 # registra usuário e direciona para home
                 self.current_user.register_confirm = datetime.utcnow()
                 msg = 'Usuário confirmado com sucesso'
-                res = dumps(dict(message=msg), ensure_ascii=False)
+                res = dumps(dict(data=dict(code=200, message=msg)), ensure_ascii=False)
                 return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
 
         # retorna token invalido
         msg = 'Token inválido'
-        res = dumps(dict(message=msg), ensure_ascii=False)
+        res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
         return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
     @view_config(route_name='api_password_forgot', renderer='json',
@@ -219,12 +227,18 @@ class ApiViews:
             msg = 'Login efetuado com sucesso'
             token_data = {'aud': 'idToken', 'username': user.username}
             token = generate_token(request=self.request, data=token_data)
+            if user.register_confirm:
+                confirmed = True
+            else :
+                confirmed = False
             res = dumps(dict(
                 data=dict(
                     code=200,
                     message=msg,
                     userId=user.username,
-                    idToken=token.decode('utf-8'))),
+                    idToken=token.decode('utf-8'),
+                    expiresIn=3600,
+                    emailConfirmed=confirmed)),
                 ensure_ascii=False)
             return HTTPOk(headers=headers, body=res, content_type='application/json; charset=UTF-8')
 

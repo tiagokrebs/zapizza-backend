@@ -32,7 +32,7 @@ def main(global_config, **settings):
 
     # todo: levar rotas para dentro de seus módulos
     # API routes
-    config.add_route('api_confirm', '/api/confirm/{token}')
+    config.add_route('api_confirm', '/api/confirm')
     config.add_route('api_login', '/api/login')
     config.add_route('api_logout', '/api/logout')
     config.add_route('api_signup', '/api/signup')
