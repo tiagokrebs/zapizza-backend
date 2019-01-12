@@ -85,7 +85,7 @@ def user_factory(request):
     if username is None:
         # Return the class
         return User
-    user = User.by_username(username)
+    user = User.by_username_email(username)
     if not user:
         raise HTTPNotFound()
     return user

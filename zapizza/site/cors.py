@@ -38,15 +38,17 @@ def add_cors_preflight_handler(config):
         permission=NO_PERMISSION_REQUIRED,
     )
 
-# todo: Access-Control-Allow-Origin atraves de development.ini e production.ini
 def add_cors_to_response(event):
     request = event.request
     response = event.response
     if 'Origin' in request.headers:
         response.headers['Access-Control-Expose-Headers'] = (
             'Content-Type,Date,Content-Length,Authorization,X-Request-ID')
+
+        # ambientes de desenvolvimento podem necessitar de permissão para diversas origens
         # response.headers['Access-Control-Allow-Origin'] = (
         #     request.headers['Origin'])
+
         response.headers['Access-Control-Allow-Origin'] = (
             request.registry.settings["cors.origin"])
         response.headers['Access-Control-Allow-Credentials'] = 'true'

@@ -1,7 +1,8 @@
 from pyramid.httpexceptions import (
     HTTPOk,
     HTTPConflict,
-    HTTPFound
+    HTTPNotFound,
+    HTTPBadRequest
 )
 from pyramid.security import remember, forget
 from pyramid.view import view_config
@@ -15,12 +16,88 @@ from datetime import datetime, timedelta
 from pyramid_sqlalchemy import Session
 from json import dumps
 from re import match
+import colander
+from deform import Form, ValidationFailure
+from jsonschema import validate, ValidationError
 
 
 # todo: verificar type error em dumps de retorno
 # todo: backend retorna http redirects ou decisão fica no frontend?
 
-class ApiViews:
+@colander.deferred
+def deferred_email_validator(node, kw):
+    current_user = kw.get('current_user')
+    email = kw.get('email')
+    if email is None or email == current_user.email:
+        return colander.Email(msg='E-mail inválido')
+    else:
+        return colander.All(colander.Email(msg='Email inválido'),
+                            colander.Function(email_validator))
+
+
+@colander.deferred
+def deferred_username_validator(node, kw):
+    current_user = kw.get('current_user')
+    username = kw.get('username')
+    if username is None or username == current_user.username:
+        return colander.All(colander.Regex(regex=r"^[a-zA-Z0-9]+$", msg='Informe apenas letras e números'),
+                            colander.Length(min=3, max=120,
+                                            min_err='informe no mínimo 3 caracteres',
+                                            max_err='Informa no máximo 120 caracteres'))
+    else:
+        return colander.All(colander.Regex(regex=r"^[a-zA-Z0-9]+$", msg='Informe apenas letras e números'),
+                            colander.Length(min=3, max=120,
+                                            min_err='informe no mínimo 3 caracteres',
+                                            max_err='Informa no máximo 120 caracteres'),
+                            colander.Function(username_validator))
+
+
+def email_validator(email):
+    if User.by_email(email):
+        return 'Este e-mail já está em uso'
+    else:
+        True
+
+
+def username_validator(username):
+    if User.by_username(username):
+        return 'Este username já está em uso'
+    else:
+        return True
+
+
+class UserSchema(colander.MappingSchema):
+    email = colander.SchemaNode(colander.String(),
+                                name='email', missing=colander.required,
+                                missing_msg='Campo obrigatório',
+                                validator=deferred_email_validator,
+                                title='E-mail', description='E-mail do usuário')
+    username = colander.SchemaNode(colander.String(),
+                                   name='username', missing=colander.required,
+                                   missing_msg='Campo obrigatório',
+                                   validator=deferred_username_validator,
+                                   title='Username', description='Username do usuário')
+    first_name = colander.SchemaNode(colander.String(),
+                                     name='firstName', missing=colander.required,
+                                     missing_msg='Campo obrigatório',
+                                     validator=colander.All(colander.Regex(regex=r"^[a-zA-Z]+$",
+                                                                           msg='Informe apenas o primeiro nome'),
+                                                            colander.Length(min=3, max=120,
+                                                                            min_err='informe no mínimo 3 caracteres',
+                                                                            max_err='Informa no máximo 120 caracteres')),
+                                     title='Primeiro nome', description='Primeiro nome do usuário')
+    last_name = colander.SchemaNode(colander.String(),
+                                    name='lastName', missing=colander.required,
+                                    missing_msg='Campo obrigatório',
+                                    validator=colander.All(colander.Regex(regex=r"^[a-zA-Z]+$",
+                                                                          msg='Informe apenas o último nome'),
+                                                           colander.Length(min=3, max=120,
+                                                                           min_err='informe no mínimo 3 caracteres',
+                                                                           max_err='Informa no máximo 120 caracteres')),
+                                    title='Último nome', description='Último nome do usuário')
+
+
+class UserViews:
     def __init__(self, context, request):
         self.current_user = request.user
         self.context = context
@@ -47,7 +124,9 @@ class ApiViews:
                     userId=user.username,
                     idToken=token.decode('utf-8'),
                     expiresIn=3600,
-                    emailConfirmed=confirmed)),
+                    emailConfirmed=confirmed,
+                    firstName=user.first_name,
+                    lastName=user.last_name)),
                 ensure_ascii=False)
             return HTTPOk(headers=headers, body=res, content_type='application/json; charset=UTF-8')
 
@@ -238,7 +317,9 @@ class ApiViews:
                     userId=user.username,
                     idToken=token.decode('utf-8'),
                     expiresIn=3600,
-                    emailConfirmed=confirmed)),
+                    emailConfirmed=confirmed,
+                    firstName=user.first_name,
+                    lastName=user.last_name)),
                 ensure_ascii=False)
             return HTTPOk(headers=headers, body=res, content_type='application/json; charset=UTF-8')
 
@@ -373,4 +454,96 @@ class ApiViews:
 
         msg = 'Verifique seu email para realizar a confirmação'
         res = dumps(dict(data=dict(code=200, message=msg)), ensure_ascii=False)
+        return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
+
+    @view_config(route_name='api_user', permission='super',
+                 renderer='json', request_method='GET')
+    def user_get(self):
+        user = self.current_user
+        if user:
+            res = dumps(dict(
+                data=dict(
+                    code=200,
+                    email=user.email,
+                    username=user.username,
+                    firstName=user.first_name,
+                    lastName=user.last_name)),
+                ensure_ascii=False)
+            return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
+
+        msg = 'Usuário não encontrado'
+        res = dumps(dict(error=dict(code=404, message=msg)), ensure_ascii=False)
+        return HTTPNotFound(body=res, content_type='application/json; charset=UTF-8')
+
+    @view_config(route_name='api_user', permission='super',
+                  renderer='json', request_method='POST')
+    def user_post(self):
+        json_body = self.request.json_body
+
+        # todo: replicar validacao de estrutura de json para todas as views
+        schema = {
+            "type": "object",
+            "properties": {
+                "email": {"type": "string"},
+                "username": {"type": "string"},
+                "firstName": {"type": "string"},
+                "lastName": {"type": "string"},
+            },
+            "required": ["email", "username", "firstName", "lastName"]
+        }
+        try:
+            validate(json_body, schema)
+        except ValidationError as e:
+            msg = e.message
+            res = dumps(dict(error=dict(code=400, message=msg)), ensure_ascii=False)
+            return HTTPBadRequest(body=res, content_type='application/json; charset=UTF-8')
+
+
+        username = json_body['username']
+        email = json_body['email']
+        user_schema = UserSchema().bind(current_user=self.current_user,
+                                        username=username,
+                                        email=email)
+        controls = self.request.json.items()
+        profile_form = Form(user_schema)
+        try:
+            appstruct = profile_form.validate(controls)
+        except ValidationFailure as e:
+            try:
+                user_schema.deserialize(e.cstruct)
+            except colander.Invalid as er:
+                errors = er.asdict()
+
+                error_list = []
+                for k, v in errors.items():
+                    error_list.append({'field': k, 'message': v})
+
+                msg = 'Dados inválidos'
+                res = dumps(dict(
+                    error=dict(
+                        code=400,
+                        message=msg,
+                        errors=error_list)),
+                    ensure_ascii=False)
+                return HTTPBadRequest(body=res, content_type='application/json; charset=UTF-8')
+
+        # formulario valido
+        # armazena restante dos dados
+        self.context.email = appstruct['email']
+        self.context.first_name = appstruct['firstName']
+        self.context.last_name = appstruct['lastName']
+
+        msg = 'Sucesso'
+        res = dumps(dict(
+            data=dict(
+                code=200,
+                message=msg)),
+            ensure_ascii=False)
+
+        # caso seja alterado e necessario lembrar o novo usuario
+        if appstruct['username'] != self.context.username:
+            self.context.username = appstruct['username']
+            headers = remember(self.request, self.context.username)
+            return HTTPOk(headers=headers, body=res, content_type='application/json; charset=UTF-8')
+
         return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
