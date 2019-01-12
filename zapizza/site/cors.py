@@ -46,13 +46,12 @@ def add_cors_to_response(event):
             'Content-Type,Date,Content-Length,Authorization,X-Request-ID')
 
         # ambientes de desenvolvimento podem necessitar de permissão para diversas origens
-        # todo: resolver AWS muda origem a cada requisição
-        response.headers['Access-Control-Allow-Origin'] = (
-            request.headers['Origin'])
+        # response.headers['Access-Control-Allow-Origin'] = (
+        #     request.headers['Origin'])
 
         # ambientes de produção devem ter origens controladas
-        # response.headers['Access-Control-Allow-Origin'] = (
-        #     request.registry.settings["cors.origin"])
+        response.headers['Access-Control-Allow-Origin'] = (
+            request.registry.settings["cors.origin"])
 
         response.headers['Access-Control-Allow-Credentials'] = 'true'
 
