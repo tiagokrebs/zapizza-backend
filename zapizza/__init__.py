@@ -36,10 +36,10 @@ def main(global_config, **settings):
     config.add_route('api_login', '/api/login')
     config.add_route('api_logout', '/api/logout')
     config.add_route('api_signup', '/api/signup')
-    config.add_route('api_password_forgot', '/api/forgot')
-    config.add_route('api_password_reset', '/api/reset')
+    config.add_route('api_pass_forgot', '/api/forgot')
+    config.add_route('api_pass_reset', '/api/reset')
     config.add_route('api_authenticated', '/api/authenticated')
-    config.add_route('api_user', '/api/user/{username}',
+    config.add_route('api_profile', '/api/user/{username}',
                      factory='.users.models.user_factory')
 
     # # Site routes

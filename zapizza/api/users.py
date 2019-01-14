@@ -17,9 +17,7 @@ from pyramid_sqlalchemy import Session
 from json import dumps
 from re import match
 import colander
-from deform import Form, ValidationFailure
 from jsonschema import validate, ValidationError
-
 
 # todo: verificar type error em dumps de retorno
 # todo: backend retorna http redirects ou decisão fica no frontend?
@@ -166,49 +164,71 @@ class UserViews:
         res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
         return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
-    @view_config(route_name='api_password_forgot', renderer='json',
+    @view_config(route_name='api_pass_forgot', renderer='json',
                  request_method='POST')
-    def password_forgot(self):
+    def pass_forgot(self):
         json_body = self.request.json_body
-        if 'email' not in json_body:
-            msg = 'Email não informado'
-            res = dumps(dict(message=msg), ensure_ascii=False)
+
+        schema = {
+            "type": "object",
+            "properties": {
+                "email": {"type": "string"}
+            },
+            "required": ["email"]
+        }
+        try:
+            validate(json_body, schema)
+        except ValidationError as e:
+            msg = e.message
+            res = dumps(dict(error=dict(code=400, message=msg)), ensure_ascii=False)
+            return HTTPBadRequest(body=res, content_type='application/json; charset=UTF-8')
+
+        email = json_body['email']
+
+        # o email precisa estar registrado
+        user = User.by_email(email)
+        if not user:
+            msg = 'O email informado não foi encontrado'
+            res = dumps(dict(error=dict(code=400, message=msg)), ensure_ascii=False)
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
         else:
-            email = json_body['email']
-            # verifica se o email informado existe
-            if not User.by_email(email):
-                msg = 'O email informado não foi encontrado'
-                res = dumps(dict(message=msg), ensure_ascii=False)
-                return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
-            else:
-                user = User.by_email(email)
-                # token expira em 1h, tipo registro, confirmado com email
-                token_data = {'exp': datetime.utcnow() + timedelta(hours=1), 'aud': 'senha', 'email': email}
-                token = generate_token(request=self.request, data=token_data)
-                reset_url = self.request.route_url('reset', token=token)
+            # token expira em 1h, tipo registro, confirmado com email
+            token_data = {'exp': datetime.utcnow() + timedelta(hours=1), 'aud': 'senha', 'email': email}
+            token = generate_token(request=self.request, data=token_data)
+            reset_url = self.request.registry.settings["cors.origin"] + '/reset/' + token.decode('utf-8')
 
-                # envio de email de confirmação
-                send_async_templated_mail(request=self.request, recipients=email,
-                                          template='templates/email/forgot_password',
-                                          context=dict(
-                                              first_name=user.first_name,
-                                              link=reset_url
-                                          ))
+            # envio de email de confirmação
+            send_async_templated_mail(request=self.request, recipients=email,
+                                      template='templates/email/forgot_password',
+                                      context=dict(
+                                          first_name=user.first_name,
+                                          link=reset_url
+                                      ))
 
-                if user:
-                    msg = 'Verifique seu email para realizar a recuperação da senha'
-                    res = dumps(dict(message=msg), ensure_ascii=False)
-                    return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
+            msg = 'Verifique seu email para realizar a recuperação da senha'
+            res = dumps(dict(data=dict(code=200, message=msg)), ensure_ascii=False)
+            return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
 
-    @view_config(route_name='api_password_reset', renderer='json',
+    @view_config(route_name='api_pass_reset', renderer='json',
                  request_method='POST')
-    def password_reset(self):
+    def pass_reset(self):
         json_body = self.request.json_body
-        if 'token' not in json_body:
-            msg = 'Token não informado'
-            res = dumps(dict(message=msg), ensure_ascii=False)
-            return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
+
+        schema = {
+            "type": "object",
+            "properties": {
+                "token": {"type": "string"},
+                "password": {"type": "string"}
+            },
+            "required": ["token", "password"]
+        }
+        try:
+            validate(json_body, schema)
+        except ValidationError as e:
+            msg = e.message
+            res = dumps(dict(error=dict(code=400, message=msg)), ensure_ascii=False)
+            return HTTPBadRequest(body=res, content_type='application/json; charset=UTF-8')
+
         token = json_body['token']
         token_data = confirm_token(request=self.request, token=token, audience='senha')
         if token_data:
@@ -216,71 +236,21 @@ class UserViews:
             email = token_data['email']
             user = User.by_email(email)
             if user and aud == 'senha':
-                # verifica existência de password
-                if 'password' not in json_body:
-                    msg = 'Password não informado'
-                    res = dumps(dict(message=msg), ensure_ascii=False)
-                    return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
                 password = json_body['password']
                 # verifica regex mínimo para password
                 if not match(r".{6,120}", password):
-                    msg = 'Informe um passord contendo no mínimo 6 caracteres'
-                    res = dumps(dict(message=msg), ensure_ascii=False)
+                    msg = 'Informe um password contendo no mínimo 6 caracteres'
+                    res = dumps(dict(error=dict(code=400, message=msg)), ensure_ascii=False)
                     return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
                 user.password = password
                 msg = 'Password alterado com sucesso'
-                res = dumps(dict(message=msg), ensure_ascii=False)
+                res = dumps(dict(data=dict(code=200, message=msg)), ensure_ascii=False)
                 return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
 
         msg = 'Token inválido'
-        res = dumps(dict(message=msg), ensure_ascii=False)
+        res = dumps(dict(error=dict(code=400, message=msg)), ensure_ascii=False)
         return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
-
-    # todo: utilizar Deform + Schemas para validação dos atributos ver user_edit_profile
-    # @view_config(route_name='reset',
-    #              renderer='templates/reset.jinja2',
-    #              request_method='POST')
-    # def reset_handler(self):
-    #     """
-    #     Ao receber confirmação da recuperação de senha valida os dados
-    #     define password no registro do usuário e direciona para página de login
-    #     """
-    #     if 'form.submitted' in self.request.params:
-    #         token = self.request.matchdict.get('token')
-    #         token_data = confirm_token(request=self.request, token=token, audience='senha')
-    #         if token_data:
-    #             aud = token_data['aud']
-    #             email = token_data['email']
-    #             user = User.by_email(email)
-    #             password = self.request.params['password']
-    #             cpassword = self.request.params['cpassword']
-    #
-    #             if user and aud == 'senha':
-    #                 # verifica existência de password
-    #                 if not password:
-    #                     return dict(form_error='Informe um password')
-    #
-    #                 # verifica regex mínimo para password
-    #                 if not match(r".{6,120}", password):
-    #                     return dict(form_error='Informe um passord contendo no mínimo 6 caracteres')
-    #
-    #                 # verifica existência de cpassword
-    #                 if not cpassword:
-    #                     return dict(form_error='Informe a confirmação do password')
-    #
-    #                 # verifia igualdadade entre passwords
-    #                 if cpassword != password:
-    #                     return dict(form_error='A confirmação do password incorreta')
-    #
-    #                 # ajusta password no registro e direciona
-    #                 # Session.query(user).filter(user.email == email). \
-    #                 #    update({user.password: password}, synchorize_session=False)
-    #                 user.password = password
-    #                 url = self.request.route_url('login')
-    #                 return HTTPFound(url)
-    #
-    #     return dict(form_error='Token inválido')
 
     @view_config(route_name='api_login', renderer='json',
                  request_method='POST')
@@ -308,7 +278,7 @@ class UserViews:
             token = generate_token(request=self.request, data=token_data)
             if user.register_confirm:
                 confirmed = True
-            else :
+            else:
                 confirmed = False
             res = dumps(dict(
                 data=dict(
@@ -340,6 +310,8 @@ class UserViews:
         request = self.request
         json_body = self.request.json_body
 
+        # todo: trocar validação para colander schema
+
         # verifica existência de email
         if 'email' not in json_body:
             msg = 'Informe um email'
@@ -360,24 +332,6 @@ class UserViews:
             return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
         username = email
-        # # verifica existência de username
-        # if 'username' not in json_body:
-        #     msg = 'Informe um username'
-        #     res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
-        #     return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
-        # username = json_body['username']
-        #
-        # # verifica uso de username por usuário existente
-        # if User.by_username(username):
-        #     msg = 'O username informado já está cadastrado'
-        #     res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
-        #     return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
-        #
-        # # verifica regex mínimo para username
-        # if not match(r"^[a-zA-Z0-9]{3,120}$", username):
-        #     msg = 'Username inválido'
-        #     res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
-        #     return HTTPConflict(body=res, content_type='application/json; charset=UTF-8')
 
         # verifica existência de password
         if 'password' not in json_body:
@@ -456,9 +410,9 @@ class UserViews:
         res = dumps(dict(data=dict(code=200, message=msg)), ensure_ascii=False)
         return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
 
-    @view_config(route_name='api_user', permission='super',
+    @view_config(route_name='api_profile', permission='super',
                  renderer='json', request_method='GET')
-    def user_get(self):
+    def profile_get(self):
         user = self.current_user
         if user:
             res = dumps(dict(
@@ -475,60 +429,39 @@ class UserViews:
         res = dumps(dict(error=dict(code=404, message=msg)), ensure_ascii=False)
         return HTTPNotFound(body=res, content_type='application/json; charset=UTF-8')
 
-    @view_config(route_name='api_user', permission='super',
-                  renderer='json', request_method='POST')
-    def user_post(self):
+    @view_config(route_name='api_profile', permission='super',
+                 renderer='json', request_method='POST')
+    def profile_post(self):
         json_body = self.request.json_body
 
-        # todo: replicar validacao de estrutura de json para todas as views
-        schema = {
-            "type": "object",
-            "properties": {
-                "email": {"type": "string"},
-                "username": {"type": "string"},
-                "firstName": {"type": "string"},
-                "lastName": {"type": "string"},
-            },
-            "required": ["email", "username", "firstName", "lastName"]
-        }
+        # montagem de cstruct elimina necessiade de validação da estrutura do json
+        # objetos faltantes retornam colander.null
+        cstruct = UserSchema().serialize(json_body)
+
+        # os tipos e dados do json precisam ser validados
+        # bind disponibiliza atributos dentro do contexto do schema para validações deferred
+        user_schema = UserSchema().bind(current_user=self.current_user,
+                                        username=cstruct['username'],
+                                        email=cstruct['email'])
         try:
-            validate(json_body, schema)
-        except ValidationError as e:
-            msg = e.message
-            res = dumps(dict(error=dict(code=400, message=msg)), ensure_ascii=False)
+            appstruct = user_schema.deserialize(cstruct)
+        except colander.Invalid as er:
+            errors = er.asdict()
+
+            error_list = []
+            for k, v in errors.items():
+                error_list.append({'field': k, 'message': v})
+
+            msg = 'Dados inválidos'
+            res = dumps(dict(
+                error=dict(
+                    code=400,
+                    message=msg,
+                    errors=error_list)),
+                ensure_ascii=False)
             return HTTPBadRequest(body=res, content_type='application/json; charset=UTF-8')
 
-
-        username = json_body['username']
-        email = json_body['email']
-        user_schema = UserSchema().bind(current_user=self.current_user,
-                                        username=username,
-                                        email=email)
-        controls = self.request.json.items()
-        profile_form = Form(user_schema)
-        try:
-            appstruct = profile_form.validate(controls)
-        except ValidationFailure as e:
-            try:
-                user_schema.deserialize(e.cstruct)
-            except colander.Invalid as er:
-                errors = er.asdict()
-
-                error_list = []
-                for k, v in errors.items():
-                    error_list.append({'field': k, 'message': v})
-
-                msg = 'Dados inválidos'
-                res = dumps(dict(
-                    error=dict(
-                        code=400,
-                        message=msg,
-                        errors=error_list)),
-                    ensure_ascii=False)
-                return HTTPBadRequest(body=res, content_type='application/json; charset=UTF-8')
-
         # formulario valido
-        # armazena restante dos dados
         self.context.email = appstruct['email']
         self.context.first_name = appstruct['firstName']
         self.context.last_name = appstruct['lastName']
@@ -540,7 +473,7 @@ class UserViews:
                 message=msg)),
             ensure_ascii=False)
 
-        # caso seja alterado e necessario lembrar o novo usuario
+        # alterações de username necessitam que um novo cookie seja respondido
         if appstruct['username'] != self.context.username:
             self.context.username = appstruct['username']
             headers = remember(self.request, self.context.username)
