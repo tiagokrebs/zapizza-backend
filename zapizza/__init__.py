@@ -28,18 +28,32 @@ def main(global_config, **settings):
     metadata.create_all()
 
     # adiciona rodas estaticas
-    config.add_static_view(name='static', path='zapizza.site:static')
+    # config.add_static_view(name='static', path='zapizza.site:static')
 
     # todo: levar rotas para dentro de seus módulos
-    # API routes
-    config.add_route('api_confirm', '/api/confirm')
-    config.add_route('api_login', '/api/login')
-    config.add_route('api_logout', '/api/logout')
-    config.add_route('api_signup', '/api/signup')
-    config.add_route('api_pass_forgot', '/api/forgot')
-    config.add_route('api_pass_reset', '/api/reset')
-    config.add_route('api_authenticated', '/api/authenticated')
-    config.add_route('api_profile', '/api/user/{username}',
+
+    # # API routes
+    # config.add_route('api_confirm', '/api/confirm')
+    # config.add_route('api_login', '/api/login')
+    # config.add_route('api_logout', '/api/logout')
+    # config.add_route('api_signup', '/api/signup')
+    # config.add_route('api_pass_forgot', '/api/forgot')
+    # config.add_route('api_pass_reset', '/api/reset')
+    # config.add_route('api_authenticated', '/api/authenticated')
+    # config.add_route('api_profile', '/api/user/{username}',
+    #                  factory='.users.models.user_factory')
+
+    # SITE routes
+    config.add_route('confirm', '/confirm')
+    config.add_route('login', '/login')
+    config.add_route('logout', '/logout')
+    config.add_route('signup', '/signup')
+    config.add_route('pass_forgot', '/forgot')
+    config.add_route('pass_reset', '/reset')
+    config.add_route('authenticated', '/authenticated')
+
+    # USER routes
+    config.add_route('users_profile', '/user/{username}/profile',
                      factory='.users.models.user_factory')
 
     # # Site routes
