@@ -1,4 +1,4 @@
-from zapizza.users.models import User
+from ..users.models import User
 import colander
 
 

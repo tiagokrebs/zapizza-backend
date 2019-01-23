@@ -36,8 +36,8 @@ class UserViews:
         return HTTPNotFound(body=res, content_type='application/json; charset=UTF-8')
 
     @view_config(route_name='users_profile', permission='super',
-                 renderer='json', request_method='POST')
-    def profile_post(self):
+                 renderer='json', request_method='PUT')
+    def profile_update(self):
         json_body = self.request.json_body
 
         # montagem de cstruct elimina necessiade de validação da estrutura do json
