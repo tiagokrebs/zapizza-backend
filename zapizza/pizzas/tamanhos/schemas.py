@@ -25,6 +25,6 @@ class TamanhoSchema(Schema):
 
     @validates('descricao')
     def validate_descricao(self, value):
-        if "tamanho" in self.context and self.context['tamanho'].descricao != value:
+        if self.context['tamanho'].descricao != value:
             if Tamanho.by_descricao(self.context['user'].empresa_id, value):
                 raise ValidationError('O tamanho ' + value + ' já existe')

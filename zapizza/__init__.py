@@ -63,7 +63,8 @@ def main(global_config, **settings):
     #                  factory='.users.models.user_factory')
 
     # rotas tamanhos
-    config.add_route('tamanhos', '/tamanhos')
+    config.add_route('tamanhos', '/tamanhos',
+                     factory='.pizzas.tamanhos.models.tamanho_factory')
     config.add_route('tamanhos_edit', '/tamanhos/{hashid}',
                      factory='.pizzas.tamanhos.models.tamanho_factory')
     config.add_route('tamanhos_enable', '/tamanhos/{hashid}/enable',

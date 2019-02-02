@@ -50,6 +50,7 @@ class TamanhoViews:
         json_body = self.request.json_body
         schema = TamanhoSchema(many=False, strict=True)
         schema.context['user'] = self.request.user
+        schema.context['tamanho'] = self.context
 
         try:
             tamanho = schema.load(json_body)
