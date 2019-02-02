@@ -42,10 +42,10 @@ class Tamanho(BaseObject):
     #    (Allow, 'group:editors', 'edit')
     # ]
 
-    # permissões do objeto
+    # permissões
     __acl__ = [
-        (Allow, 'group:admins', 'view'),
-        (Allow, 'group:editors', 'view'),
+        (Allow, 'group:admins', 'super'),
+        (Allow, 'group:editors', 'edit'),
         (Allow, 'group:users', 'view'),
     ]
 
@@ -57,6 +57,8 @@ class Tamanho(BaseObject):
     @classmethod
     def by_hash_id(cls, empresa_id, tamanho_hash_id):
         data = decode_hash('tamanhos', tamanho_hash_id)
+        if not data:
+            raise HTTPForbidden()
         empresa_id_decoded = data[0]
         id_decoded = data[1]
         if empresa_id_decoded != empresa_id:
@@ -67,6 +69,11 @@ class Tamanho(BaseObject):
     @classmethod
     def list(cls, empresa_id):
         return Session.query(cls).filter(cls.empresa_id == empresa_id).order_by(cls.descricao).all()
+
+    # pesquisa por descrição
+    @classmethod
+    def by_descricao(cls, empresa_id, descricao):
+        return Session.query(cls).filter(and_(cls.empresa_id == empresa_id, cls.descricao == descricao)).first()
 
 
 
@@ -88,8 +95,7 @@ def tamanho_factory(request):
     if tamanho_hash_id is None:
         # retorna a classe
         return Tamanho
-    user = User.by_username(request.authenticated_userid)
-    tamanho = Tamanho.by_hash_id(user.empresa_id, tamanho_hash_id)
+    tamanho = Tamanho.by_hash_id(request.user.empresa_id, tamanho_hash_id)
     if not tamanho:
         raise HTTPNotFound()
     return tamanho
