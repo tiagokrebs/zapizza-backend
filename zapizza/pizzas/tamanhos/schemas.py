@@ -15,7 +15,7 @@ class TamanhoSchema(Schema):
     descricao = fields.Str(required=True, validate=validate.Length(min=3, max=120))
     sigla = fields.Str(required=True, validate=validate.Length(min=1, max=3))
     quantSabores = fields.Integer(required=True, validate=validate.Range(min=1), attribute="quant_sabores")
-    quantBordas = fields.Integer(required=True, validate=validate.Range(min=1), attribute="quant_bordas")
+    quantBordas = fields.Integer(required=True, validate=validate.Range(min=0), attribute="quant_bordas")
     quantFatias = fields.Integer(required=True, validate=validate.Range(min=1), attribute="quant_fatias")
     ativo = fields.Boolean()
 

@@ -2,7 +2,8 @@ from pyramid.httpexceptions import (
     HTTPFound,
     HTTPOk,
     HTTPNotFound,
-    HTTPBadRequest
+    HTTPBadRequest,
+    HTTPConflict
 )
 from pyramid.view import (
     view_config,
@@ -151,9 +152,26 @@ class TamanhoViews:
             ensure_ascii=False)
         return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
 
-    @view_config(route_name='tamanhos_enable', request_method='PUT',
-                 renderer='json')
+    @view_config(route_name='tamanhos_enable', renderer='json',
+                 request_method='PUT')
     def tamanho_enable(self):
-        self.context.ativo = True
-        self.request.session.flash('Ativado: %s' % self.context.descricao, 'success')
-        return HTTPFound(location=self.request.route_url('tamanhos_list'))
+        json_body = self.request.json_body
+
+        if 'ativo' not in json_body:
+            msg = 'ativo is required'
+            res = dumps(dict(error=dict(code=409, message=msg)), ensure_ascii=False)
+            return HTTPBadRequest(body=res, content_type='application/json; charset=UTF-8')
+        ativo = json_body['ativo']
+
+        self.context.ativo = ativo
+
+        # objeto de retorno precisa ser serializado
+        schema = TamanhoSchema(many=False, strict=True)
+        result = schema.dump(self.context)
+
+        res = dumps(dict(
+            data=dict(
+                code=200,
+                tamanho=result.data)),
+            ensure_ascii=False)
+        return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
