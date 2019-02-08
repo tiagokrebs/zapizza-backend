@@ -152,6 +152,20 @@ class TamanhoViews:
             ensure_ascii=False)
         return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
 
+    @view_config(route_name='tamanhos_edit', renderer='json',
+                 request_method='DELETE')
+    def tamanho_delete(self):
+        t = self.context
+        Session.delete(t)
+
+        msg = 'Registro deletado'
+        res = dumps(dict(
+            data=dict(
+                code=200,
+                message=msg)),
+            ensure_ascii=False)
+        return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
+
     @view_config(route_name='tamanhos_enable', renderer='json',
                  request_method='PUT')
     def tamanho_enable(self):

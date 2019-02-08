@@ -19,10 +19,12 @@ class TamanhoSchema(Schema):
     quantFatias = fields.Integer(required=True, validate=validate.Range(min=1), attribute="quant_fatias")
     ativo = fields.Boolean()
 
+    # definição do objeto de retorno pos serialização
     @post_load
     def make_tamanho(self, data):
         return Tamanho(**data)
 
+    # verificação de descrição já utilizada
     @validates('descricao')
     def validate_descricao(self, value):
         if self.context['tamanho'].descricao != value:

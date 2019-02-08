@@ -76,14 +76,13 @@ class Tamanho(BaseObject):
         return Session.query(cls).filter(and_(cls.empresa_id == empresa_id, cls.descricao == descricao)).first()
 
 
-
 """ 
 A factory do obtem hashid da url da rota. Exemplo /tamanhos/{hashid}/edit
 Quando não existe o parâmetro {hasihd} uma instância vazia do objeto é retornada
 Quando o parâmetro {hashid} existe e o objeto existe a instância de objeto desse hashid é retornada
 Quando o parâmetro {hashid} existe e o objeto não existe retorna página não encontrada
 
-Também é obtido o usuário autenticado na sessão atual para a descoberta da empresa
+Também é obtido o usuário autenticado do request para a descoberta da empresa
 Quando os dados de objeto são filtrados é passada a hashid contendo a tupla (empresa_id, objeto_id)
 juntamente com o empresa_id do usuário logado
 Caso o método de pesquisa de objeto falhe por diferença entre empresa_id forbidden é retornado
