@@ -29,7 +29,12 @@ class TamanhoViews:
     @view_config(route_name='tamanhos', renderer='json',
                  request_method='GET')
     def tamanho_get_list(self):
-        tamanhos = Tamanho.list(self.current_user.empresa_id)
+        offset = int(self.request.GET.get('start', 0))
+        limit = int(self.request.GET.get('size', 10))
+        sort = self.request.GET.get('sort', 'descricao')
+        order = self.request.GET.get('order', 'asc')
+        tamanhos = Tamanho.list(self.current_user.empresa_id, offset, limit, sort, order)
+        total = Tamanho.total(self.current_user.empresa_id)[0]
         schema = TamanhoSchema(many=is_iterable_but_not_string(tamanhos), strict=True)
         result = schema.dump(tamanhos)
 
@@ -37,6 +42,9 @@ class TamanhoViews:
             res = dumps(dict(
                 data=dict(
                     code=200,
+                    itemsPerPage=limit,
+                    startIndex=offset+1,
+                    totalItems=total,
                     tamanhos=result.data)),
                 ensure_ascii=False)
             return HTTPOk(body=res, content_type='application/json; charset=UTF-8')

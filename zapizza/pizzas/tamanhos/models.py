@@ -8,7 +8,9 @@ from sqlalchemy import (
     ForeignKey,
     and_,
     Boolean,
-    inspect
+    func,
+    desc,
+    asc
 )
 from sqlalchemy.ext.serializer import loads, dumps
 from sqlalchemy.orm import relationship
@@ -67,8 +69,16 @@ class Tamanho(BaseObject):
 
     # retorna lista de Tamanho filtrado por empresa
     @classmethod
-    def list(cls, empresa_id):
-        return Session.query(cls).filter(cls.empresa_id == empresa_id).order_by(cls.descricao).all()
+    def list(cls, empresa_id, offset, limit, sort, order):
+        s = asc(sort)
+        if order == 'desc':
+            s = desc(sort)
+        q = Session.query(cls).filter(cls.empresa_id == empresa_id).order_by(s).limit(limit).offset(offset)
+        return q.all()
+
+    @classmethod
+    def total(cls, empresa_id):
+        return Session.query(func.count(cls.id)).filter(cls.empresa_id == empresa_id).first()
 
     # pesquisa por descrição
     @classmethod
