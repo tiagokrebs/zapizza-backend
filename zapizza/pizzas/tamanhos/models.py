@@ -12,11 +12,9 @@ from sqlalchemy import (
     desc,
     asc
 )
-from sqlalchemy.ext.serializer import loads, dumps
 from sqlalchemy.orm import relationship
 from pyramid_sqlalchemy import BaseObject, Session
-from ...site.hashid import decode_hash
-from ...users.models import User
+from ...site.hashid import get_decoded_id
 
 
 class Tamanho(BaseObject):
@@ -31,12 +29,10 @@ class Tamanho(BaseObject):
     quant_fatias = Column(Integer)
     ativo = Column(Boolean, nullable=False, default=True)
 
-    empresa = relationship('Empresa',
-                           back_populates='tamanhos')
-    sabor = relationship(
-        'Sabor',
-        secondary='sabores_tamanhos',
-        back_populates='tamanho')
+    empresa = relationship('Empresa')
+
+    def __repr__(self):
+        return 'Tamanho(%s)' % repr(self.descricao)
 
     # coluna para permissão por registro
     # default_acl = [
@@ -58,14 +54,8 @@ class Tamanho(BaseObject):
     # decodifica hash_id recebido, certifica empresa_id e retorna Tamanho filtrado
     @classmethod
     def by_hash_id(cls, empresa_id, tamanho_hash_id):
-        data = decode_hash('tamanhos', tamanho_hash_id)
-        if not data:
-            raise HTTPForbidden()
-        empresa_id_decoded = data[0]
-        id_decoded = data[1]
-        if empresa_id_decoded != empresa_id:
-            raise HTTPForbidden()
-        return Session.query(cls).filter(and_(cls.id == id_decoded, cls.empresa_id == empresa_id_decoded)).first()
+        decoded_id = get_decoded_id('tamanhos', tamanho_hash_id, empresa_id)
+        return Session.query(cls).filter(cls.id == decoded_id).first()
 
     # retorna lista de Tamanho filtrado por empresa
     @classmethod

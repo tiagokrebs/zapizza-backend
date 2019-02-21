@@ -1,3 +1,4 @@
+import sys
 from pyramid.httpexceptions import (
     HTTPOk,
     HTTPNotFound,
@@ -8,41 +9,36 @@ from pyramid.view import (
     view_defaults
 )
 from pyramid_sqlalchemy import Session
-from .models import Tamanho
+from .models import Sabor
 from ...site.hashid import generate_hash
-from .schemas import TamanhoSchema
+from .schemas import SaborSchema, SaborTamanhoSchema
 from json import dumps
 from marshmallow import ValidationError
 from marshmallow.utils import is_iterable_but_not_string
 
 
 @view_defaults(permission='super')
-class TamanhoViews:
+class SaborViews:
     def __init__(self, context, request):
         self.context = context
         self.request = request
         self.current_user = request.user
 
-    @view_config(route_name='tamanhos', renderer='json',
+    @view_config(route_name='sabores', renderer='json',
                  request_method='GET')
-    def tamanho_get_list(self):
-        offset = int(self.request.GET.get('start', 0))
-        limit = int(self.request.GET.get('size', 10))
-        sort = self.request.GET.get('sort', 'descricao')
-        order = self.request.GET.get('order', 'asc')
-        tamanhos = Tamanho.list(self.current_user.empresa_id, offset, limit, sort, order)
-        total = Tamanho.total(self.current_user.empresa_id)[0]
-        schema = TamanhoSchema(many=is_iterable_but_not_string(tamanhos), strict=True)
-        result = schema.dump(tamanhos)
+    def sabor_get_list(self):
+        sabores = Sabor.list(self.current_user.empresa_id)
+        total = Sabor.total(self.current_user.empresa_id)[0]
+        schema = SaborSchema(many=is_iterable_but_not_string(sabores), strict=True)
+        schema.context['user'] = self.request.user
+        result = schema.dump(sabores)
 
-        if tamanhos:
+        if sabores:
             res = dumps(dict(
                 data=dict(
                     code=200,
-                    itemsPerPage=limit,
-                    startIndex=offset+1,
                     totalItems=total,
-                    tamanhos=result.data)),
+                    sabores=result.data)),
                 ensure_ascii=False)
             return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
 
@@ -50,16 +46,16 @@ class TamanhoViews:
         res = dumps(dict(error=dict(code=404, message=msg)), ensure_ascii=False)
         return HTTPNotFound(body=res, content_type='application/json; charset=UTF-8')
 
-    @view_config(route_name='tamanhos', renderer='json',
+    @view_config(route_name='sabores', renderer='json',
                  request_method='POST')
-    def tamanho_add(self):
+    def sabor_add(self):
         json_body = self.request.json_body
-        schema = TamanhoSchema(many=False, strict=True)
+        schema = SaborSchema(many=False, strict=True)
         schema.context['user'] = self.request.user
-        schema.context['tamanho'] = self.context
+        schema.context['sabor'] = self.context
 
         try:
-            tamanho = schema.load(json_body)
+            sabor = schema.load(json_body)
         except ValidationError as err:
             errors = err.messages
 
@@ -77,36 +73,37 @@ class TamanhoViews:
             return HTTPBadRequest(body=res, content_type='application/json; charset=UTF-8')
 
         # com a deserialização ok a inserção é permitida
-        t = tamanho.data
+        t = sabor.data
         t.ativo = True
         t.empresa_id = self.current_user.empresa_id
         Session.add(t)
         Session.flush()
         Session.refresh(t)
-        t.hash_id = generate_hash('tamanhos', [self.current_user.empresa_id, t.id])
+        t.hash_id = generate_hash('sabores', [self.current_user.empresa_id, t.id])
 
         # objeto de retorno precisa ser serializado
-        result = schema.dump(tamanho.data)
+        result = schema.dump(sabor.data)
 
         res = dumps(dict(
             data=dict(
                 code=200,
-                tamanho=result.data)),
+                sabor=result.data)),
             ensure_ascii=False)
         return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
 
-    @view_config(route_name='tamanhos_edit', renderer='json',
+    @view_config(route_name='sabores_edit', renderer='json',
                  request_method='GET')
-    def tamanho_get(self):
-        tamanho = self.context
-        schema = TamanhoSchema(many=False, strict=True)
-        result = schema.dump(tamanho)
+    def sabor_get(self):
+        sabor = self.context
+        schema = SaborSchema(many=False, strict=True)
+        schema.context['user'] = self.request.user
+        result = schema.dump(sabor)
 
-        if tamanho:
+        if sabor:
             res = dumps(dict(
                 data=dict(
                     code=200,
-                    tamanho=result.data)),
+                    sabor=result.data)),
                 ensure_ascii=False)
             return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
 
@@ -114,16 +111,16 @@ class TamanhoViews:
         res = dumps(dict(error=dict(code=404, message=msg)), ensure_ascii=False)
         return HTTPNotFound(body=res, content_type='application/json; charset=UTF-8')
 
-    @view_config(route_name='tamanhos_edit', renderer='json',
+    @view_config(route_name='sabores_edit', renderer='json',
                  request_method='PUT')
-    def tamanho_update(self):
+    def sabor_update(self):
         json_body = self.request.json_body
-        schema = TamanhoSchema(many=False, strict=True)
+        schema = SaborSchema(many=False, strict=True)
         schema.context['user'] = self.request.user
-        schema.context['tamanho'] = self.context
+        schema.context['sabor'] = self.context
 
         try:
-            tamanho = schema.load(json_body)
+            sabor = schema.load(json_body)
         except ValidationError as err:
             errors = err.messages
 
@@ -141,11 +138,12 @@ class TamanhoViews:
             return HTTPBadRequest(body=res, content_type='application/json; charset=UTF-8')
 
         # com a deserialização ok a atualização é permitida
-        self.context.descricao = tamanho.data.descricao
-        self.context.sigla = tamanho.data.sigla
-        self.context.quant_sabores = tamanho.data.quant_sabores
-        self.context.quant_fatias = tamanho.data.quant_fatias
-        self.context.quant_bordas = tamanho.data.quant_bordas
+        tamanhos = sabor.data.tamanhos
+        for tamanho in tamanhos:
+            tamanho.sabor_id = self.context.id
+
+        self.context.descricao = sabor.data.descricao
+        self.context.tamanhos = tamanhos
 
         # objeto de retorno precisa ser serializado
         result = schema.dump(self.context)
@@ -153,13 +151,13 @@ class TamanhoViews:
         res = dumps(dict(
             data=dict(
                 code=200,
-                tamanho=result.data)),
+                sabor=result.data)),
             ensure_ascii=False)
         return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
 
-    @view_config(route_name='tamanhos_edit', renderer='json',
+    @view_config(route_name='sabores_edit', renderer='json',
                  request_method='DELETE')
-    def tamanho_delete(self):
+    def sabor_delete(self):
         t = self.context
         Session.delete(t)
 
@@ -171,9 +169,9 @@ class TamanhoViews:
             ensure_ascii=False)
         return HTTPOk(body=res, content_type='application/json; charset=UTF-8')
 
-    @view_config(route_name='tamanhos_enable', renderer='json',
+    @view_config(route_name='sabores_enable', renderer='json',
                  request_method='PUT')
-    def tamanho_enable(self):
+    def sabor_enable(self):
         json_body = self.request.json_body
 
         if 'ativo' not in json_body:
@@ -185,12 +183,13 @@ class TamanhoViews:
         self.context.ativo = ativo
 
         # objeto de retorno precisa ser serializado
-        schema = TamanhoSchema(many=False, strict=True)
+        schema = SaborSchema(many=False, strict=True)
+        schema.context['user'] = self.request.user
         result = schema.dump(self.context)
 
         res = dumps(dict(
             data=dict(
                 code=200,
-                tamanho=result.data)),
+                sabor=result.data)),
             ensure_ascii=False)
         return HTTPOk(body=res, content_type='application/json; charset=UTF-8')

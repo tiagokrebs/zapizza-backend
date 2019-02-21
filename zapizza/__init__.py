@@ -71,16 +71,12 @@ def main(global_config, **settings):
                      factory='.pizzas.tamanhos.models.tamanho_factory')
 
     # rotas sabores
-    # config.add_route('sabores_list', '/sabores',
-    #                  factory='.pizzas.tamanhos.models.sabor_factory')
-    # config.add_route('sabores_add', '/sabores/add',
-    #                  factory='.pizzas.tamanhos.models.sabor_factory')
-    # config.add_route('sabores_edit', '/sabores/{hashid}/edit',
-    #                  factory='.pizzas.tamanhos.models.sabor_factory')
-    # config.add_route('sabores_enable', '/sabores/{hashid}/enable',
-    #                  factory='.pizzas.tamahos.models.sabor_factory')
-    # config.add_route('sabores_disable', '/sabores/{hashid}/disable',
-    #                  factory='.pizzas.tamanhos.models.sabor_factory')
+    config.add_route('sabores', '/sabores',
+                     factory='.pizzas.sabores.models.sabor_factory')
+    config.add_route('sabores_edit', '/sabores/{hashid}',
+                     factory='.pizzas.sabores.models.sabor_factory')
+    config.add_route('sabores_enable', '/sabores/{hashid}/enable',
+                     factory='.pizzas.sabores.models.sabor_factory')
 
     # Factory da sessao
     session_secret = settings['session.secret']
