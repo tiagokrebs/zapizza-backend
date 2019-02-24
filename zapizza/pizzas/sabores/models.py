@@ -1,4 +1,4 @@
-from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.security import Allow
 
 from sqlalchemy import (
@@ -6,9 +6,9 @@ from sqlalchemy import (
     Integer,
     String,
     ForeignKey,
-    and_,
     Boolean,
     func,
+    and_,
     Numeric
 )
 from sqlalchemy.orm import relationship
@@ -52,7 +52,6 @@ class Sabor(BaseObject):
     def total(cls, empresa_id):
         return Session.query(func.count(cls.id)).filter(cls.empresa_id == empresa_id).first()
 
-    # pesquisa por descrição
     @classmethod
     def by_descricao(cls, empresa_id, descricao):
         return Session.query(cls).filter(and_(cls.empresa_id == empresa_id, cls.descricao == descricao)).first()
@@ -70,7 +69,6 @@ class SaborTamanho(BaseObject):
 def sabor_factory(request):
     sabor_hash_id = request.matchdict.get('hashid')
     if sabor_hash_id is None:
-        # retorna a classe
         return Sabor
     sabor = Sabor.by_hash_id(request.user.empresa_id, sabor_hash_id)
     if not sabor:

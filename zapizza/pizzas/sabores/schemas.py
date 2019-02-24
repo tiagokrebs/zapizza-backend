@@ -2,7 +2,6 @@ from marshmallow import (
     Schema,
     fields,
     post_load,
-    pre_load,
     post_dump,
     ValidationError,
     validates,
@@ -10,7 +9,7 @@ from marshmallow import (
 )
 from .models import Sabor, SaborTamanho
 from ..tamanhos.models import Tamanho
-from ...site.hashid import get_decoded_id, generate_hash
+from ...site.hashid import generate_hash
 
 
 class SaborTamanhoSchema(Schema):
@@ -23,23 +22,13 @@ class SaborTamanhoSchema(Schema):
     hash_id = fields.String(attribute="tamanho_id")
     valor = fields.Number()
 
-    # @pre_load(pass_many=True)
-    # def decode_hashid(self, data, many):
-    #     """
-    #     Na pré deserialização hash_id é decodificado para id
-    #
-    #     :param data: dados do objeto a ser deserializado
-    #     :param many: true/false indica se objeto é uma lista
-    #     :return: dados com id decodificado
-    #     """
-    #     for d in data:
-    #         decoded_id = get_decoded_id('tamanhos', d['tamanho_id'], self.context['user'].empresa_id)
-    #         d['tamanho_id'] = decoded_id
-    #     return data
-
     @post_load
     def make_sabor_tamanho(self, data):
         """
+        No pós deserialização objeto SaborTamanho é composto
+        onde atributo 'tamanho' recebe objeto Tamanho referente ao hash_id
+        e valor de 'tamanho_id' é alterado de hash_id para id
+
         :param data: dados do objeto a ser deserializado
         :return: instância de SaborTamanho
         """
@@ -67,7 +56,6 @@ class SaborSchema(Schema):
     """
         Classe principal do sabor integra tamanhos como filhos de sabor
     """
-    # id = fields.Integer()
     hash_id = fields.String()
     descricao = fields.Str(required=True, validate=validate.Length(min=3, max=120))
     ativo = fields.Boolean()

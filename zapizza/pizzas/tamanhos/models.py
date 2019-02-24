@@ -1,4 +1,4 @@
-from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.security import Allow
 
 from sqlalchemy import (
@@ -6,11 +6,11 @@ from sqlalchemy import (
     Integer,
     String,
     ForeignKey,
-    and_,
     Boolean,
     func,
     desc,
-    asc
+    asc,
+    and_
 )
 from sqlalchemy.orm import relationship
 from pyramid_sqlalchemy import BaseObject, Session
@@ -63,14 +63,13 @@ class Tamanho(BaseObject):
         s = asc(sort)
         if order == 'desc':
             s = desc(sort)
-        q = Session.query(cls).filter(cls.empresa_id == empresa_id).order_by(s).limit(limit).offset(offset)
-        return q.all()
+        return Session.query(cls).filter(cls.empresa_id == empresa_id).order_by(s)\
+            .limit(limit).offset(offset).all()
 
     @classmethod
     def total(cls, empresa_id):
         return Session.query(func.count(cls.id)).filter(cls.empresa_id == empresa_id).first()
 
-    # pesquisa por descrição
     @classmethod
     def by_descricao(cls, empresa_id, descricao):
         return Session.query(cls).filter(and_(cls.empresa_id == empresa_id, cls.descricao == descricao)).first()
@@ -92,7 +91,6 @@ Caso o método de pesquisa de objeto falhe por diferença entre empresa_id forbi
 def tamanho_factory(request):
     tamanho_hash_id = request.matchdict.get('hashid')
     if tamanho_hash_id is None:
-        # retorna a classe
         return Tamanho
     tamanho = Tamanho.by_hash_id(request.user.empresa_id, tamanho_hash_id)
     if not tamanho:
@@ -118,7 +116,7 @@ sample_tamanhos = [
         quant_sabores=2,
         quant_bordas=1,
         quant_fatias=6,
-        ativo=True
+        ativo=False
     ),
     dict(
         id=3,

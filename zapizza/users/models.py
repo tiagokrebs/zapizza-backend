@@ -1,5 +1,5 @@
 from pyramid.httpexceptions import HTTPNotFound
-from pyramid.security import Allow, Deny, ALL_PERMISSIONS
+from pyramid.security import Allow
 from sqlalchemy import (
     Column,
     String,
@@ -8,7 +8,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey
 )
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql.functions import now
 from pyramid_sqlalchemy import BaseObject, Session
 
@@ -39,7 +39,8 @@ class User(BaseObject):
         (Allow, 'group:editors', 'edit'),
         (Allow, 'group:users', 'view'),
     ]
-    #def __acl__(self):
+
+    # def __acl__(self):
     #    return [
     #        (Allow, 'group:admins', 'super'),
     #        (Allow, 'group:editors', 'edit'),

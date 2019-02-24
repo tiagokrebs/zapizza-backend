@@ -1,16 +1,11 @@
-from pyramid.httpexceptions import HTTPNotFound
-from pyramid.security import Allow, Everyone, Deny, ALL_PERMISSIONS
 from sqlalchemy import (
     Column,
     Integer,
-    String,
-    or_
+    String
 )
 from sqlalchemy.orm import relationship
-from pyramid_sqlalchemy import BaseObject, Session
+from pyramid_sqlalchemy import BaseObject
 
-from ..columns import ArrayType
-from ..site.hashid import generate_hash, decode_hash
 
 # Modelo da empresa
 class Empresa(BaseObject):
@@ -23,10 +18,6 @@ class Empresa(BaseObject):
     tamanhos = relationship('Tamanho', back_populates='empresa', cascade='all, delete')
     sabores = relationship('Sabor', back_populates='empresa', cascade='all, delete')
 
-    # método busca usuario por razao
-    @classmethod
-    def by_razao(cls, razao):
-        return Session.query(cls).filter(cls.razao_social == razao).first()
 
 # dados exemplo
 sample_empresas = [

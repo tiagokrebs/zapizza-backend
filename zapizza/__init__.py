@@ -32,17 +32,6 @@ def main(global_config, **settings):
 
     # todo: levar rotas para dentro de seus módulos
 
-    # # API routes
-    # config.add_route('api_confirm', '/api/confirm')
-    # config.add_route('api_login', '/api/login')
-    # config.add_route('api_logout', '/api/logout')
-    # config.add_route('api_signup', '/api/signup')
-    # config.add_route('api_pass_forgot', '/api/forgot')
-    # config.add_route('api_pass_reset', '/api/reset')
-    # config.add_route('api_authenticated', '/api/authenticated')
-    # config.add_route('api_profile', '/api/user/{username}',
-    #                  factory='.users.models.user_factory')
-
     # rotas site
     config.add_route('confirm', '/confirm')
     config.add_route('login', '/login')
@@ -55,12 +44,6 @@ def main(global_config, **settings):
     # rotas user
     config.add_route('users_profile', '/user/{username}/profile',
                      factory='.users.models.user_factory')
-    # config.add_route('users_list', '/users',
-    #                  factory='.users.models.user_factory')
-    # config.add_route('users_add', '/users/add',
-    #                  factory='.users.models.user_factory')
-    # config.add_route('users_delete', '/users/{username}/delete',
-    #                  factory='.users.models.user_factory')
 
     # rotas tamanhos
     config.add_route('tamanhos', '/tamanhos',
@@ -77,6 +60,14 @@ def main(global_config, **settings):
                      factory='.pizzas.sabores.models.sabor_factory')
     config.add_route('sabores_enable', '/sabores/{hashid}/enable',
                      factory='.pizzas.sabores.models.sabor_factory')
+
+    # rotas bordas
+    config.add_route('bordas', '/bordas',
+                     factory='.pizzas.bordas.models.borda_factory')
+    config.add_route('bordas_edit', '/bordas/{hashid}',
+                     factory='.pizzas.bordas.models.borda_factory')
+    config.add_route('bordas_enable', '/bordas/{hashid}/enable',
+                     factory='.pizzas.bordas.models.borda_factory')
 
     # Factory da sessao
     session_secret = settings['session.secret']

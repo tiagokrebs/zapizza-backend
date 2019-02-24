@@ -20,6 +20,7 @@ def generate_token(request, data):
     secret = request.registry.settings["token.secret"]
     return jwt.encode(data, secret, algorithm='HS512')
 
+
 def confirm_token(request, token, audience):
     secret = request.registry.settings["token.secret"]
     try:

@@ -10,7 +10,6 @@ from .models import Tamanho
 
 
 class TamanhoSchema(Schema):
-    # id = fields.Integer()
     hash_id = fields.String()
     descricao = fields.Str(required=True, validate=validate.Length(min=3, max=120))
     sigla = fields.Str(required=True, validate=validate.Length(min=1, max=3))
