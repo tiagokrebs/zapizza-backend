@@ -69,6 +69,14 @@ def main(global_config, **settings):
     config.add_route('bordas_enable', '/bordas/{hashid}/enable',
                      factory='.pizzas.bordas.models.borda_factory')
 
+    # rotas bebidas
+    config.add_route('bebidas', '/bebidas',
+                     factory='.bebidas.models.bebida_factory')
+    config.add_route('bebidas_edit', '/bebidas/{hashid}',
+                     factory='.bebidas.models.bebida_factory')
+    config.add_route('bebidas_enable', '/bebidas/{hashid}/enable',
+                     factory='.bebidas.models.bebida_factory')
+
     # Factory da sessao
     session_secret = settings['session.secret']
     session_factory = SignedCookieSessionFactory(session_secret)
