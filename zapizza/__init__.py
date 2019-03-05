@@ -32,20 +32,24 @@ def main(global_config, **settings):
 
     # todo: levar rotas para dentro de seus módulos
 
-    # rotas site
+    # registro
+    config.add_route('signup', '/signup')
     config.add_route('confirm', '/confirm')
+
+    # login/logout
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
-    config.add_route('signup', '/signup')
-    config.add_route('pass_forgot', '/forgot')
-    config.add_route('pass_reset', '/reset')
     config.add_route('authenticated', '/authenticated')
 
-    # rotas user
+    # esqueci a senha
+    config.add_route('pass_forgot', '/forgot')
+    config.add_route('pass_reset', '/reset')
+
+    # /user
     config.add_route('users_profile', '/user/{username}/profile',
                      factory='.users.models.user_factory')
 
-    # rotas tamanhos
+    # /tamanhos
     config.add_route('tamanhos', '/tamanhos',
                      factory='.pizzas.tamanhos.models.tamanho_factory')
     config.add_route('tamanhos_edit', '/tamanhos/{hashid}',
@@ -53,7 +57,7 @@ def main(global_config, **settings):
     config.add_route('tamanhos_enable', '/tamanhos/{hashid}/enable',
                      factory='.pizzas.tamanhos.models.tamanho_factory')
 
-    # rotas sabores
+    # /sabores
     config.add_route('sabores', '/sabores',
                      factory='.pizzas.sabores.models.sabor_factory')
     config.add_route('sabores_edit', '/sabores/{hashid}',
@@ -61,7 +65,7 @@ def main(global_config, **settings):
     config.add_route('sabores_enable', '/sabores/{hashid}/enable',
                      factory='.pizzas.sabores.models.sabor_factory')
 
-    # rotas bordas
+    # /bordas
     config.add_route('bordas', '/bordas',
                      factory='.pizzas.bordas.models.borda_factory')
     config.add_route('bordas_edit', '/bordas/{hashid}',
@@ -69,13 +73,33 @@ def main(global_config, **settings):
     config.add_route('bordas_enable', '/bordas/{hashid}/enable',
                      factory='.pizzas.bordas.models.borda_factory')
 
-    # rotas bebidas
+    # /bebidas
     config.add_route('bebidas', '/bebidas',
                      factory='.bebidas.models.bebida_factory')
     config.add_route('bebidas_edit', '/bebidas/{hashid}',
                      factory='.bebidas.models.bebida_factory')
     config.add_route('bebidas_enable', '/bebidas/{hashid}/enable',
                      factory='.bebidas.models.bebida_factory')
+
+    # /clientes
+    config.add_route('clientes', '/clientes',
+                     factory='.clientes.models.cliente_factory')
+    config.add_route('clientes_edit', '/clientes/{hashid}',
+                     factory='.clientes.models.cliente_factory')
+    config.add_route('clientes_enable', '/clientes/{hashid}/enable',
+                     factory='.clientes.models.cliente_factory')
+
+    # /clientes/enderecos
+    config.add_route('enderecos', '/clientes/{cliHashid}/enderecos',
+                     factory='.clientes.enderecos.models.endereco_factory')
+    config.add_route('enderecos_edit', '/clientes/{cliHashid}/enderecos/{endHashid}',
+                     factory='.clientes.enderecos.models.endereco_factory')
+
+    # /clientes/telefones
+    config.add_route('telefones', '/clientes/{cliHashid}/telefones',
+                     factory='.clientes.telefones.models.telefone_factory')
+    config.add_route('telefones_edit', '/clientes/{cliHashid}/telefones/{telHashid}',
+                     factory='.clientes.telefones.models.telefone_factory')
 
     # Factory da sessao
     session_secret = settings['session.secret']

@@ -29,7 +29,7 @@ class Tamanho(BaseObject):
     quant_fatias = Column(Integer)
     ativo = Column(Boolean, nullable=False, default=True)
 
-    empresa = relationship('Empresa')
+    empresa = relationship('Empresa', back_populates='tamanhos')
 
     def __repr__(self):
         return 'Tamanho(%s)' % repr(self.descricao)

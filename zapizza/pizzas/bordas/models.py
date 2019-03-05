@@ -25,7 +25,7 @@ class Borda(BaseObject):
     valor = Column(Numeric(precision=6, scale=2), nullable=False)
     ativo = Column(Boolean, nullable=False, default=True)
 
-    empresa = relationship('Empresa')
+    empresa = relationship('Empresa', back_populates='bordas')
 
     def __repr__(self):
         return 'Borda(%s)' % repr(self.descricao)

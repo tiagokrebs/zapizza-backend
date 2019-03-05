@@ -24,7 +24,7 @@ class Sabor(BaseObject):
     descricao = Column(String(120), nullable=False)
     ativo = Column(Boolean, nullable=False, default=True)
 
-    empresa = relationship('Empresa')
+    empresa = relationship('Empresa', back_populates='sabores')
     tamanhos = relationship("SaborTamanho", cascade="all, delete-orphan")
 
     def __repr__(self):

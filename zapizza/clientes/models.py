@@ -16,19 +16,22 @@ from pyramid_sqlalchemy import BaseObject, Session
 from ..site.hashid import get_decoded_id
 
 
-class Bebida(BaseObject):
-    __tablename__ = 'bebidas'
+class Cliente(BaseObject):
+    __tablename__ = 'clientes'
     id = Column(Integer, primary_key=True)
     empresa_id = Column(Integer, ForeignKey('empresas.id'), nullable=False)
     hash_id = Column(String(120), index=True, unique=True)
-    descricao = Column(String(120), nullable=False)
-    valor = Column(Numeric(precision=6, scale=2), nullable=False)
+    nome = Column(String(100))
     ativo = Column(Boolean, nullable=False, default=True)
 
-    empresa = relationship('Empresa', back_populates='bebidas')
+    empresa = relationship('Empresa', back_populates='clientes')
+
+    telefones = relationship("Telefone", back_populates='cliente', cascade="all, delete-orphan")
+    enderecos = relationship("Endereco", back_populates='cliente', cascade="all, delete-orphan")
+
 
     def __repr__(self):
-        return 'Bebida(%s)' % repr(self.descricao)
+        return 'Cliente(%s)' % repr(self.nome)
 
     __acl__ = [
         (Allow, 'group:admins', 'super'),
@@ -37,13 +40,13 @@ class Bebida(BaseObject):
     ]
 
     @classmethod
-    def by_hash_id(cls, empresa_id, bebida_hash_id):
+    def by_hash_id(cls, empresa_id, cliente_hash_id):
         """
         :param empresa_id: identificação da empresa do usuário
-        :param bebida_hash_id: identificacao codificada do objeto
+        :param cliente_hash_id: identificacao codificada do objeto
         :return: dados do objeto referente ao id decodificado
         """
-        decoded_id = get_decoded_id('bebidas', bebida_hash_id, empresa_id)
+        decoded_id = get_decoded_id('clientes', cliente_hash_id, empresa_id)
         return Session.query(cls).filter(cls.id == decoded_id).first()
 
     @classmethod
@@ -52,7 +55,7 @@ class Bebida(BaseObject):
         :param empresa_id: identificação da empresa do usuário
         :return: lista de objetos encontrados
         """
-        return Session.query(cls).filter(cls.empresa_id == empresa_id).order_by(cls.descricao).all()
+        return Session.query(cls).filter(cls.empresa_id == empresa_id).order_by(cls.nome).all()
 
     @classmethod
     def total(cls, empresa_id):
@@ -62,30 +65,19 @@ class Bebida(BaseObject):
         """
         return Session.query(func.count(cls.id)).filter(cls.empresa_id == empresa_id).first()
 
-    @classmethod
-    def by_descricao(cls, empresa_id, descricao):
-        """
-        Busca por descrição é utilizada na validação de POST/PUT do objeto
 
-        :param empresa_id: identificação da empresa do usuário
-        :param descricao: descrição do objeto
-        :return: objeto encontrado
-        """
-        return Session.query(cls).filter(and_(cls.empresa_id == empresa_id, cls.descricao == descricao)).first()
-
-
-def bebida_factory(request):
+def cliente_factory(request):
     """
     Factory é chamada pela view da rota acessada,
-    busca por objeto Bebida com base em parametro {hashid} da url.
+    busca por objeto Cliente com base em parametro {hashid} da url.
 
     :param request: objeto de request do framework
-    :return: Bebida ou HttpNotFound caso busca retorne nulo
+    :return: Cliente ou HttpNotFound caso busca retorne nulo
     """
-    bebida_hash_id = request.matchdict.get('hashid')
-    if bebida_hash_id is None:
-        return Bebida
-    bebida = Bebida.by_hash_id(request.user.empresa_id, bebida_hash_id)
-    if not bebida:
+    cliente_hash_id = request.matchdict.get('hashid')
+    if cliente_hash_id is None:
+        return Cliente
+    cliente = Cliente.by_hash_id(request.user.empresa_id, cliente_hash_id)
+    if not cliente:
         raise HTTPNotFound()
-    return bebida
+    return cliente
