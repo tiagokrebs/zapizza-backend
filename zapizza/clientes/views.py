@@ -26,8 +26,14 @@ class ClienteViews:
     @view_config(route_name='clientes', renderer='json',
                  request_method='GET')
     def cliente_get_list(self):
-        clientes = Cliente.list(self.current_user.empresa_id)
-        total = Cliente.total(self.current_user.empresa_id)[0]
+        offset = int(self.request.GET.get('start', 0))
+        limit = int(self.request.GET.get('size', 10))
+        sort = self.request.GET.get('sort', 'nome')
+        order = self.request.GET.get('order', 'asc')
+        nome = self.request.GET.get('nome')
+        ativo = self.request.GET.get('ativo')
+        clientes = Cliente.list(self.current_user.empresa_id, offset, limit, sort, order, nome, ativo)
+        total = Cliente.total(self.current_user.empresa_id, nome, ativo)[0]
         schema = ClienteSchema(many=is_iterable_but_not_string(clientes), strict=True)
         result = schema.dump(clientes)
 

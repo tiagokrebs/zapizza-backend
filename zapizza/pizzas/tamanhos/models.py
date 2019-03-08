@@ -59,12 +59,8 @@ class Tamanho(BaseObject):
 
     # retorna lista de Tamanho filtrado por empresa
     @classmethod
-    def list(cls, empresa_id, offset, limit, sort, order):
-        s = asc(sort)
-        if order == 'desc':
-            s = desc(sort)
-        return Session.query(cls).filter(cls.empresa_id == empresa_id).order_by(s)\
-            .limit(limit).offset(offset).all()
+    def list(cls, empresa_id):
+        return Session.query(cls).filter(cls.empresa_id == empresa_id).order_by(cls.descricao).all()
 
     @classmethod
     def total(cls, empresa_id):
