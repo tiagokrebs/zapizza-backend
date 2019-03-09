@@ -19,7 +19,7 @@ class Empresa(BaseObject):
     tamanhos = relationship('Tamanho', back_populates='empresa', cascade='all, delete')
     sabores = relationship('Sabor', back_populates='empresa', cascade='all, delete')
     bordas = relationship('Borda', back_populates='empresa', cascade='all, delete')
-    bebidas = relationship('Bebida', back_populates='empresa', cascade='all, delete')
+    adicionais = relationship('Adicional', back_populates='empresa', cascade='all, delete')
     clientes = relationship('Cliente', back_populates='empresa', cascade='all, delete')
 
 
