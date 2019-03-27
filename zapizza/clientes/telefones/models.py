@@ -21,9 +21,9 @@ class Telefone(BaseObject):
     id = Column(Integer, primary_key=True)
     hash_id = Column(String(120), index=True, unique=True)
     cliente_id = Column(Integer, ForeignKey('clientes.id'), nullable=False)
-    telefone = Column(String(15))
+    telefone = Column(String(15), nullable=False)
+    tipo = Column(String(10), nullable=False)
 
-    cliente = relationship('Cliente', back_populates='telefones')
 
     def __repr__(self):
         return 'Telefone(%s)' % repr(self.telefone)

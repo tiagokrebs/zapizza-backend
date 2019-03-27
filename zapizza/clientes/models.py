@@ -26,10 +26,12 @@ class Cliente(BaseObject):
     nome = Column(String(100))
     ativo = Column(Boolean, nullable=False, default=True)
 
+    # many to one
     empresa = relationship('Empresa', back_populates='clientes')
 
-    telefones = relationship("Telefone", back_populates='cliente', cascade="all, delete-orphan")
-    enderecos = relationship("Endereco", back_populates='cliente', cascade="all, delete-orphan")
+    # one to many
+    telefones = relationship("Telefone", cascade="all, delete-orphan")
+    enderecos = relationship("Endereco", cascade="all, delete-orphan")
 
 
     def __repr__(self):

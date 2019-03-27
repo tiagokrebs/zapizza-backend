@@ -7,6 +7,7 @@ from marshmallow import (
     validate
 )
 from .models import Endereco
+from ...site.hashid import get_decoded_id
 
 
 class EnderecoSchema(Schema):
@@ -23,10 +24,20 @@ class EnderecoSchema(Schema):
     @post_load
     def make_endereco(self, data):
         """
+        Caso hash_id exista em data é necessário definir id do objeto
+        Objetos com id geram um UPDATE do banco de dados
+        Objetos sem id geram INSERT
         :param data: dados do objeto a ser deserializado
         :return: instância de Endereco
         """
-        return Endereco(**data)
+        e = Endereco(**data)
+        if e.hash_id:
+            decoded_id = get_decoded_id('enderecos', e.hash_id, self.context['user'].empresa_id)
+            e.id = decoded_id
+        else:
+            # hash_id em inserções precisa ser nulo e não vazio
+            e.hash_id = None
+        return e
 
     @validates('logradouro')
     def validate_logradouro(self, value):
@@ -35,6 +46,6 @@ class EnderecoSchema(Schema):
         :param value: valor do atributo logradouro
         :return: nulo ou ValidationError
         """
-        if self.context['endereco'].logradouro != value:
+        if 'endereco' in self.context and self.context['endereco'].logradouro != value:
             if Endereco.by_logradouro(self.context['cliente_id'], value):
                 raise ValidationError('O cliente já possui endereço no logradouro informado')

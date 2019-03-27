@@ -81,7 +81,13 @@ class ClienteViews:
         Session.add(t)
         Session.flush()
         Session.refresh(t)
+
+        # define hash_id dos registros pai e lista de filhos
         t.hash_id = generate_hash('clientes', [self.current_user.empresa_id, t.id])
+        for telefone in t.telefones:
+            telefone.hash_id = generate_hash('telefones', [self.current_user.empresa_id, telefone.id])
+        for endereco in t.enderecos:
+            endereco.hash_id = generate_hash('enderecos', [self.current_user.empresa_id, endereco.id])
 
         # objeto de retorno precisa ser serializado
         result = schema.dump(cliente.data)
@@ -117,6 +123,7 @@ class ClienteViews:
     def cliente_update(self):
         json_body = self.request.json_body
         schema = ClienteSchema(many=False, strict=True)
+        schema.context['user'] = self.request.user
 
         try:
             cliente = schema.load(json_body)
@@ -136,8 +143,20 @@ class ClienteViews:
                 ensure_ascii=False)
             return HTTPBadRequest(body=res, content_type='application/json; charset=UTF-8')
 
-        # com a deserialização ok a atualização é permitida
         self.context.nome = cliente.data.nome
+        self.context.telefones = cliente.data.telefones
+        self.context.enderecos = cliente.data.enderecos
+
+        # com a deserialização ok a inserção é permitida
+        Session.flush()
+        # Session.refresh()
+
+        # define hash_id dos registros pai e lista de filhos
+        self.context.hash_id = generate_hash('clientes', [self.current_user.empresa_id, self.context.id])
+        for telefone in self.context.telefones:
+            telefone.hash_id = generate_hash('telefones', [self.current_user.empresa_id, telefone.id])
+        for endereco in self.context.enderecos:
+            endereco.hash_id = generate_hash('enderecos', [self.current_user.empresa_id, endereco.id])
 
         # objeto de retorno precisa ser serializado
         result = schema.dump(self.context)

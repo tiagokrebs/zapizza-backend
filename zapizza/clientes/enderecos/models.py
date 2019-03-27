@@ -28,9 +28,7 @@ class Endereco(BaseObject):
     bairro = Column(String(100), nullable=False)
     cidade = Column(String(100), nullable=False)
     estado = Column(String(2), nullable=False)
-    ibge = Column(String(7))
 
-    cliente = relationship('Cliente', back_populates='enderecos')
 
     def __repr__(self):
         return 'Endereço(%s)' % repr(self.logradouro)
