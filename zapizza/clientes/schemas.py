@@ -18,8 +18,6 @@ class ClienteSchema(Schema):
     telefones = fields.Nested(TelefoneSchema, required=True, many=True)
     enderecos = fields.Nested(EnderecoSchema, required=True, many=True)
 
-    # todo: para evitar que telefones e endereços sofram delete e insert adicionar cliente_id aos objetos filho
-
     @post_load
     def make_cliente(self, data):
         """
@@ -27,3 +25,9 @@ class ClienteSchema(Schema):
         :return: instância de Cliente
         """
         return Cliente(**data)
+
+
+class ClienteSelectSchema(Schema):
+    hash_id = fields.String(dump_to='value')
+    nome = fields.Str(dump_to='label')
+    telefone = fields.Str(dump_to='label')

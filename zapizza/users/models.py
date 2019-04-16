@@ -8,7 +8,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, defer
 from sqlalchemy.sql.functions import now
 from pyramid_sqlalchemy import BaseObject, Session
 
@@ -65,7 +65,8 @@ class User(BaseObject):
     # método busca usuario por username ou email (login)
     @classmethod
     def by_username_email(cls, username):
-        return Session.query(cls).filter(or_(cls.username == username, cls.email == username)).first()
+        return Session.query(cls).filter(or_(cls.username == username, cls.email == username))\
+            .options(defer("password")).first()
 
     # método retorna lista de usuários ordenada nome
     @classmethod

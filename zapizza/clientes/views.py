@@ -10,7 +10,7 @@ from pyramid.view import (
 from pyramid_sqlalchemy import Session
 from .models import Cliente
 from ..site.hashid import generate_hash
-from .schemas import ClienteSchema
+from .schemas import ClienteSchema, ClienteSelectSchema
 from json import dumps
 from marshmallow import ValidationError
 from marshmallow.utils import is_iterable_but_not_string
@@ -31,10 +31,20 @@ class ClienteViews:
         sort = self.request.GET.get('sort', 'nome')
         order = self.request.GET.get('order', 'asc')
         nome = self.request.GET.get('nome')
+        telefone = self.request.GET.get('telefone')
         ativo = self.request.GET.get('ativo')
-        clientes = Cliente.list(self.current_user.empresa_id, offset, limit, sort, order, nome, ativo)
-        total = Cliente.total(self.current_user.empresa_id, nome, ativo)[0]
-        schema = ClienteSchema(many=is_iterable_but_not_string(clientes), strict=True)
+        q = self.request.GET.get('q', 'list')
+
+        # 'q' define retorno de lista completa ou tipo select (valor/label)
+        if q == 'select' and (nome or telefone):
+            clientes = Cliente.select_list(self.current_user.empresa_id, limit, nome, telefone)
+            total = len(clientes)
+            schema = ClienteSelectSchema(many=True, strict=True)
+        else:
+            clientes = Cliente.list(self.current_user.empresa_id, offset, limit, sort, order, nome, ativo)
+            total = Cliente.total(self.current_user.empresa_id, nome, ativo)[0]
+            schema = ClienteSchema(many=is_iterable_but_not_string(clientes), strict=True)
+
         result = schema.dump(clientes)
 
         if clientes:

@@ -13,9 +13,10 @@ from sqlalchemy import (
     asc,
     desc
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, joinedload, load_only
 from pyramid_sqlalchemy import BaseObject, Session
 from ..site.hashid import get_decoded_id
+from .telefones.models import Telefone
 
 
 class Cliente(BaseObject):
@@ -32,7 +33,6 @@ class Cliente(BaseObject):
     # one to many
     telefones = relationship("Telefone", cascade="all, delete-orphan")
     enderecos = relationship("Endereco", cascade="all, delete-orphan")
-
 
     def __repr__(self):
         return 'Cliente(%s)' % repr(self.nome)
@@ -66,26 +66,32 @@ class Cliente(BaseObject):
         :param ativo: filtro para a coluna ativo
         :return:
         """
-        s = asc(sort)
+
+        s = asc('clientes_' + sort)  # joinedload obriga concatenação
         if order == 'desc':
             s = desc(sort)
 
+        # todo: parametro 'q' para lista completa ou lista para select (novo ClienteSelectSchema)
         # todo: é necessário um método para filtros dinâmicos de acordo com modelo
 
         if nome and ativo:
             return Session.query(cls)\
                 .filter(and_(cls.empresa_id == empresa_id, cls.nome.ilike('%' + nome + '%'), cls.ativo == ativo))\
+                .options(joinedload(cls.telefones), joinedload(cls.enderecos))\
                 .order_by(s).limit(limit).offset(offset).all()
         elif nome:
             return Session.query(cls) \
                 .filter(and_(cls.empresa_id == empresa_id, cls.nome.ilike('%' + nome + '%'))) \
+                .options(joinedload(cls.telefones), joinedload(cls.enderecos)) \
                 .order_by(s).limit(limit).offset(offset).all()
         elif ativo:
             return Session.query(cls) \
                 .filter(and_(cls.empresa_id == empresa_id, cls.ativo == ativo)) \
+                .options(joinedload(cls.telefones), joinedload(cls.enderecos)) \
                 .order_by(s).limit(limit).offset(offset).all()
         else:
-            return Session.query(cls).filter(cls.empresa_id == empresa_id).order_by(s)\
+            return Session.query(cls).filter(cls.empresa_id == empresa_id).order_by(s) \
+                .options(joinedload(cls.telefones), joinedload(cls.enderecos)) \
                 .limit(limit).offset(offset).all()
 
     @classmethod
@@ -110,6 +116,26 @@ class Cliente(BaseObject):
                 .filter(cls.empresa_id == empresa_id)\
                 .first()
 
+    @classmethod
+    def select_list(cls, empresa_id, limit, nome, telefone):
+        """
+        Método de seleção de dados para componentes tipo select
+        :param empresa_id: identificacao da empresa
+        :param limit: limite de registros
+        :param nome: filtro para atributo nome
+        :param telefone: filtro para atributo telefone
+        :return:
+        """
+        if nome:
+            return Session.query(cls.hash_id, cls.nome) \
+                .filter(and_(cls.empresa_id == empresa_id, cls.nome.ilike('%' + nome + '%'), cls.ativo == True)) \
+                .order_by(cls.nome).limit(limit).all()
+        elif telefone:
+            return Session.query(cls.hash_id, Telefone.telefone) \
+                .join(cls.telefones) \
+                .filter(and_(cls.empresa_id == empresa_id, cls.ativo == True)) \
+                .filter(Telefone.telefone.like('%' + telefone + '%')) \
+                .order_by(Telefone.telefone).limit(limit).all()
 
 def cliente_factory(request):
     """

@@ -11,7 +11,7 @@ from sqlalchemy import (
     and_,
     Numeric
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, joinedload
 from pyramid_sqlalchemy import BaseObject, Session
 from ...site.hashid import get_decoded_id
 

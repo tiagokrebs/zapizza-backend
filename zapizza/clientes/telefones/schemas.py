@@ -2,12 +2,13 @@ from marshmallow import (
     Schema,
     fields,
     post_load,
+    post_dump,
     ValidationError,
     validates,
     validate
 )
 from .models import Telefone
-from ...site.hashid import get_decoded_id
+from ...site.hashid import get_decoded_id, generate_hash
 
 
 class TelefoneSchema(Schema):
