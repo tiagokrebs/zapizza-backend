@@ -21,6 +21,7 @@ class Empresa(BaseObject):
     bordas = relationship('Borda', back_populates='empresa', cascade='all, delete')
     adicionais = relationship('Adicional', back_populates='empresa', cascade='all, delete')
     clientes = relationship('Cliente', back_populates='empresa', cascade='all, delete')
+    pedidos = relationship('Pedido', back_populates='empresa', cascade='all, delete')
 
 
 # dados exemplo

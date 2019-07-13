@@ -33,6 +33,7 @@ class Cliente(BaseObject):
     # one to many
     telefones = relationship("Telefone", cascade="all, delete-orphan")
     enderecos = relationship("Endereco", cascade="all, delete-orphan")
+    pedidos = relationship('Pedido', back_populates='cliente', cascade='all, delete')
 
     def __repr__(self):
         return 'Cliente(%s)' % repr(self.nome)
@@ -136,6 +137,7 @@ class Cliente(BaseObject):
                 .filter(and_(cls.empresa_id == empresa_id, cls.ativo == True)) \
                 .filter(Telefone.telefone.like('%' + telefone + '%')) \
                 .order_by(Telefone.telefone).limit(limit).all()
+
 
 def cliente_factory(request):
     """

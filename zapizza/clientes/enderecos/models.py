@@ -29,6 +29,8 @@ class Endereco(BaseObject):
     cidade = Column(String(100), nullable=False)
     estado = Column(String(2), nullable=False)
 
+    # one to many
+    pedidos = relationship('Pedido', back_populates='endereco', cascade='all, delete')
 
     def __repr__(self):
         return 'Endereço(%s)' % repr(self.logradouro)

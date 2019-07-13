@@ -101,6 +101,14 @@ def main(global_config, **settings):
     config.add_route('telefones_edit', '/clientes/{cliHashid}/telefones/{telHashid}',
                      factory='.clientes.telefones.models.telefone_factory')
 
+    # /pedidos
+    config.add_route('pedidos', '/pedidos',
+                     factory='.pedidos.models.pedido_factory')
+    config.add_route('pedidos_edit', '/pedidos/{hashid}',
+                     factory='.pedidos.models.pedido_factory')
+    config.add_route('pedidos_enable', '/pedidos/{hashid}/enable',
+                     factory='.pedidos.models.pedido_factory')
+
     # Factory da sessao
     session_secret = settings['session.secret']
     session_factory = SignedCookieSessionFactory(session_secret)
