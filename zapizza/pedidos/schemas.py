@@ -2,6 +2,7 @@ from marshmallow import (
     Schema,
     fields,
     post_load,
+    post_dump,
     ValidationError,
     validates,
     validate
@@ -14,6 +15,7 @@ from ..pizzas.bordas.models import Borda
 from ..pizzas.tamanhos.models import Tamanho
 from ..clientes.enderecos.models import Endereco
 from ..clientes.models import Cliente
+from ..site.hashid import generate_hash
 
 
 class PedidoAdicionalSchema(Schema):
@@ -99,6 +101,10 @@ class PedidoProdutosSchema(Schema):
                           validate=validate.Length(min=1))
 
 
+class PedidoClienteSchema(Schema):
+    nome = fields.String()
+
+
 class PedidoSchema(Schema):
     hash_id = fields.String()
     finalizacao = fields.DateTime()
@@ -108,6 +114,7 @@ class PedidoSchema(Schema):
     endereco_id = fields.String(required=True, validate=validate.Length(min=6, max=120))
     obs_entrega = fields.String()
     valor_total = fields.Number(required=True, validate=validate.Range(min=0))
+    cliente = fields.Nested(PedidoClienteSchema, many=False)
 
     @post_load
     def make_pedido(self, data):
@@ -123,6 +130,24 @@ class PedidoSchema(Schema):
         data['cliente_id'] = c.id
 
         return Pedido(**data)
+
+    @post_dump(pass_many=True)
+    def encode_id(self, data, many):
+        """
+        No pós serialização cliente_id e endereco_id são codificado para hash_id
+
+        :param data: dados do objeto a ser serializadp
+        :param many: true/false indica se objeto é uma lista
+        :return: dados com id codificado
+        """
+        for d in data:
+            encoded_endereco_id = generate_hash('enderecos', [self.context['user'].empresa_id, int(d['endereco_id'])])
+            d['endereco_id'] = encoded_endereco_id
+
+            encoded_cliente_id = generate_hash('clientes', [self.context['user'].empresa_id, int(d['cliente_id'])])
+            d['cliente_id'] = encoded_cliente_id
+
+        return data
 
     @validates('cliente_id')
     def validate_cliente_id(self, value):

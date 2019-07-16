@@ -17,7 +17,7 @@ from sqlalchemy import (
     desc,
 
 )
-from sqlalchemy.orm import relationship, joinedload
+from sqlalchemy.orm import relationship, joinedload, load_only
 from pyramid_sqlalchemy import BaseObject, Session
 from sqlalchemy.sql.functions import now
 from ..site.hashid import get_decoded_id
@@ -84,9 +84,12 @@ class Pedido(BaseObject):
             decoded_id = get_decoded_id('clientes', cliente, empresa_id)
             return Session.query(cls) \
                 .filter(and_(cls.empresa_id == empresa_id, cls.cliente_id == decoded_id)) \
+                .options(joinedload(cls.cliente)) \
                 .order_by(s).limit(limit).offset(offset).all()
         else:
-            return Session.query(cls).filter(cls.empresa_id == empresa_id).order_by(s) \
+            return Session.query(cls) \
+                .filter(cls.empresa_id == empresa_id).order_by(s) \
+                .options(joinedload(cls.cliente).load_only('nome')) \
                 .limit(limit).offset(offset).all()
 
     @classmethod
