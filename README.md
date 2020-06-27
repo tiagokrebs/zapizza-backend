@@ -6,7 +6,7 @@ Setup Linux
 Dá teus pulo aí...
 
 
-SETUP WINDOWS
+Setup Windows
 --
 
 **Instalar requisitos Python3.6 e Git client**
