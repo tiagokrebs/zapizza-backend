@@ -1,4 +1,4 @@
-#Zapizza2.0
+# Zapizza Backend
 
 Setup Linux
 -----------------
