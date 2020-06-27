@@ -1,6 +1,12 @@
 #Zapizza2.0
 
-SETUP WINDOWS 10
+Setup Linux
+-----------------
+
+Dá teus pulo aí...
+
+
+SETUP WINDOWS
 --
 
 **Instalar requisitos Python3.6 e Git client**
@@ -11,7 +17,7 @@ Fazer Download e instalar o GIT client de https://git-scm.com/download/win
 
 **Configurar ambiente de desenvolvimento** 
 
-Abrir PowerShell Windows. O PowerShell se assemelha ao linux porque integra comandos bash (cd, ls, rm, ...)
+Abrir PowerShell Windows.
 
 **Testar versão Python instalada**
 ```bash
@@ -70,10 +76,6 @@ Sistema é disponibilizado em http://127.0.0.1:6543
 Se você chegou até aqui fique feliz :)
 
 
-Setup Linux
------------------
-
-Dá teus pulo aí...
 
 Deploy em Heroku
 -----------------
