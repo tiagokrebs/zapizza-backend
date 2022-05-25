@@ -33,7 +33,7 @@ psycopg2==2.7.5
 psycopg2-binary==2.7.5
 pyasn1==0.4.5
 Pygments==2.2.0
-PyJWT==1.6.3
+PyJWT==2.4.0
 pyramid==1.9.1
 pyramid-chameleon==0.3
 pyramid-debugtoolbar==4.4
