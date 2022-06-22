@@ -21,7 +21,7 @@ lxml==4.2.1
 Mako==1.0.7
 MarkupSafe==1.0
 marshmallow==2.18.0
-numpy==1.15.4
+numpy==1.22.0
 pandas==0.23.4
 PasteDeploy==1.5.2
 peppercorn==0.5
