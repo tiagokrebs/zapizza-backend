@@ -1,6 +1,6 @@
 awscli==1.16.88
 botocore==1.12.78
-certifi==2018.4.16
+certifi==2022.12.7
 Chameleon==3.2
 chardet==3.0.4
 colander==1.4
